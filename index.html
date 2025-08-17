@@ -156,7 +156,7 @@
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
         // 從你的 Firebase 專案中貼上 firebaseConfig 物件
-        const myFirebaseConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyBpgbhTJkxi5j8HrwpUzFfZHAABcOfZnKs",
             authDomain: "exercise-tracker-d339a.firebaseapp.com",
             projectId: "exercise-tracker-d339a",
@@ -166,22 +166,13 @@
             measurementId: "G-VSP6K6KQHG"
         };
         
-        // 全域變數，由 Canvas 環境提供
-        const canvasConfig = {
-          appId: typeof __app_id !== 'undefined' ? __app_id : myFirebaseConfig.projectId,
-          firebaseConfig: typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : myFirebaseConfig,
-          initialAuthToken: typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null,
-        };
-
-        // 確保程式碼在認證完成後才執行
+        // 全域變數，確保在任何地方都能存取
         let userId = null;
         let unsubscribe = null;
         let db = null;
         let auth = null;
         let app = null;
 
-        // 在本地儲存中使用的鍵名
-        const STORAGE_KEY = 'exerciseChallengeDataV2';
         // 挑戰總目標
         const TOTAL_GOAL = 2500;
         
@@ -242,7 +233,7 @@
                 unsubscribe(); // 停止舊的監聽器
             }
             // 建立 Firestore 查詢
-            const usersRef = collection(db, `artifacts/${canvasConfig.appId}/public/data/participants`);
+            const usersRef = collection(db, `artifacts/${firebaseConfig.projectId}/public/data/participants`);
             const q = query(usersRef);
 
             // 設定 onSnapshot 監聽器以取得即時更新
@@ -273,7 +264,7 @@
         // 函數：將資料儲存到 Firestore
         async function saveDataToFirestore(participantId) {
             try {
-                const participantRef = doc(db, `artifacts/${canvasConfig.appId}/public/data/participants`, participantId);
+                const participantRef = doc(db, `artifacts/${firebaseConfig.projectId}/public/data/participants`, participantId);
                 const dataToSave = { ...challengeData[participantId] };
                 // 在儲存前，將 dailyLog 物件轉換為 JSON 字串
                 dataToSave.dailyLog = JSON.stringify(dataToSave.dailyLog);
@@ -301,7 +292,7 @@
                 
                 // 將新參賽者資料儲存到 Firestore
                 try {
-                    const newParticipantRef = doc(db, `artifacts/${canvasConfig.appId}/public/data/participants`, newParticipantId);
+                    const newParticipantRef = doc(db, `artifacts/${firebaseConfig.projectId}/public/data/participants`, newParticipantId);
                     const dataToSave = { ...newParticipant };
                     dataToSave.dailyLog = JSON.stringify(dataToSave.dailyLog);
                     await setDoc(newParticipantRef, dataToSave);
@@ -318,7 +309,7 @@
             const participant = challengeData[participantId];
             if (participant && participant.creatorId === userId) {
                 try {
-                    const participantRef = doc(db, `artifacts/${canvasConfig.appId}/public/data/participants`, participantId);
+                    const participantRef = doc(db, `artifacts/${firebaseConfig.projectId}/public/data/participants`, participantId);
                     await deleteDoc(participantRef);
                     console.log(`已成功移除參賽者：${participant.name}`);
                 } catch (e) {
@@ -624,18 +615,14 @@
             // 進行 Firebase 認證
             try {
                 // 初始化 Firebase 應用程式
-                app = initializeApp(canvasConfig.firebaseConfig);
+                app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
                 const analytics = getAnalytics(app);
 
-                if (canvasConfig.initialAuthToken) {
-                    const userCredential = await signInWithCustomToken(auth, canvasConfig.initialAuthToken);
-                    userId = userCredential.user.uid;
-                } else {
-                    const userCredential = await signInAnonymously(auth);
-                    userId = userCredential.user.uid;
-                }
+                const userCredential = await signInAnonymously(auth);
+                userId = userCredential.user.uid;
+                
                 userIdElem.textContent = userId;
                 
                 // 載入資料並即時監聽
