@@ -154,20 +154,30 @@
         import { getAuth, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection, query, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // 全域變數，由 Canvas 環境提供
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // 初始化 Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+        // 從你的 Firebase 專案中貼上 firebaseConfig 物件
+        const myFirebaseConfig = {
+            apiKey: "AIzaSyBpgbhTJkxi5j8HrwpUzFfZHAABcOfZnKs",
+            authDomain: "exercise-tracker-d339a.firebaseapp.com",
+            projectId: "exercise-tracker-d339a",
+            storageBucket: "exercise-tracker-d339a.firebasestorage.app",
+            messagingSenderId: "133943402653",
+            appId: "1:133943402653:web:03328186b7addd755b3474",
+            measurementId: "G-VSP6K6KQHG"
+        };
         
+        // 全域變數，由 Canvas 環境提供
+        const canvasConfig = {
+          appId: typeof __app_id !== 'undefined' ? __app_id : myFirebaseConfig.projectId,
+          firebaseConfig: typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : myFirebaseConfig,
+          initialAuthToken: typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null,
+        };
+
         // 確保程式碼在認證完成後才執行
         let userId = null;
         let unsubscribe = null;
-
+        let db = null;
+        let auth = null;
+        
         // 在本地儲存中使用的鍵名
         const STORAGE_KEY = 'exerciseChallengeDataV2';
         // 挑戰總目標
@@ -230,7 +240,7 @@
                 unsubscribe(); // 停止舊的監聽器
             }
             // 建立 Firestore 查詢
-            const usersRef = collection(db, `artifacts/${appId}/public/data/participants`);
+            const usersRef = collection(db, `artifacts/${canvasConfig.appId}/public/data/participants`);
             const q = query(usersRef);
 
             // 設定 onSnapshot 監聽器以取得即時更新
@@ -256,7 +266,7 @@
         // 函數：將資料儲存到 Firestore
         async function saveDataToFirestore(participantId) {
             try {
-                const participantRef = doc(db, `artifacts/${appId}/public/data/participants`, participantId);
+                const participantRef = doc(db, `artifacts/${canvasConfig.appId}/public/data/participants`, participantId);
                 const dataToSave = { ...challengeData[participantId] };
                 // 在儲存前，將 dailyLog 物件轉換為 JSON 字串
                 dataToSave.dailyLog = JSON.stringify(dataToSave.dailyLog);
@@ -284,7 +294,7 @@
                 
                 // 將新參賽者資料儲存到 Firestore
                 try {
-                    const newParticipantRef = doc(db, `artifacts/${appId}/public/data/participants`, newParticipantId);
+                    const newParticipantRef = doc(db, `artifacts/${canvasConfig.appId}/public/data/participants`, newParticipantId);
                     const dataToSave = { ...newParticipant };
                     dataToSave.dailyLog = JSON.stringify(dataToSave.dailyLog);
                     await setDoc(newParticipantRef, dataToSave);
@@ -301,7 +311,7 @@
             const participant = challengeData[participantId];
             if (participant && participant.creatorId === userId) {
                 try {
-                    const participantRef = doc(db, `artifacts/${appId}/public/data/participants`, participantId);
+                    const participantRef = doc(db, `artifacts/${canvasConfig.appId}/public/data/participants`, participantId);
                     await deleteDoc(participantRef);
                     console.log(`已成功移除參賽者：${participant.name}`);
                 } catch (e) {
@@ -489,8 +499,7 @@
         // 函數：處理按鈕點擊事件
         async function handleExerciseClick(exerciseType) {
             const participantId = participantSelect.value;
-            if (!participantId) {
-                // 使用自定義的彈窗來代替 alert
+            if (!participantId || !challengeData[participantId]) {
                 const modal = document.createElement('div');
                 modal.className = 'modal';
                 modal.innerHTML = `
@@ -585,6 +594,7 @@
         // 將編輯和移除函數暴露給全局，以便 HTML 中的 `onclick` 使用
         window.editParticipantName = editParticipantName;
         window.removeParticipant = removeParticipant;
+        window.addParticipant = addParticipant;
 
         // 綁定事件監聽器
         btnSquat.addEventListener('click', () => handleExerciseClick('squat'));
@@ -606,8 +616,13 @@
 
             // 進行 Firebase 認證
             try {
-                if (initialAuthToken) {
-                    const userCredential = await signInWithCustomToken(auth, initialAuthToken);
+                // 初始化 Firebase 應用程式
+                const app = initializeApp(canvasConfig.firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (canvasConfig.initialAuthToken) {
+                    const userCredential = await signInWithCustomToken(auth, canvasConfig.initialAuthToken);
                     userId = userCredential.user.uid;
                 } else {
                     const userCredential = await signInAnonymously(auth);
@@ -616,7 +631,7 @@
                 userIdElem.textContent = userId;
                 
                 // 載入資料並即時監聽
-                loadDataFromFirestore();
+                loadDataFromFirestore(db, canvasConfig.appId);
             } catch (error) {
                 console.error("Firebase 認證失敗:", error);
                 userIdElem.textContent = "認證失敗";
