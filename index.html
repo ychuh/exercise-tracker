@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>運動挑戰追蹤器（分輪次 / Username-Password）</title>
+  <title>運動挑戰追蹤器</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans TC',sans-serif;background:#f3f4f6;color:#1f2937}
@@ -13,16 +13,12 @@
            background:rgba(0,0,0,.4);justify-content:center;align-items:center}
     .modal-content{background:#fff;margin:auto;padding:20px;border-radius:12px;width:92%;max-width:420px;
                    box-shadow:0 8px 24px rgba(0,0,0,.15)}
-    /* 手機更緊湊 */
-    @media (max-width: 767px){
-      .card { border-radius: 16px; }
-      .min-w-mobile { min-width: 640px; }
-    }
+    @media (max-width: 767px){ .card { border-radius: 16px; } }
   </style>
 </head>
 <body class="p-4 md:p-10 min-h-screen flex items-start md:items-center justify-center">
 
-  <!-- 登入區（手機寬度友好） -->
+  <!-- 登入頁 -->
   <div id="login-page" class="w-full max-w-md p-6 md:p-8 bg-white rounded-2xl shadow-xl card">
     <h1 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-blue-800 text-center">運動挑戰追蹤器</h1>
     <div class="text-xs md:text-sm text-gray-600 mb-4 text-center">
@@ -35,7 +31,7 @@
       <input id="password" type="password" placeholder="密碼"
              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
       <button id="loginBtn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg active:scale-[.98]">
-        登入（無帳號會自動建立）
+        登入
       </button>
       <p id="login-error" class="text-sm text-red-600 h-5"></p>
     </div>
@@ -44,7 +40,7 @@
 
   <!-- 主頁 -->
   <div id="app-page" class="hidden bg-white p-4 md:p-8 rounded-2xl shadow-xl max-w-6xl w-full card">
-    <!-- 頂部：手機更緊湊 -->
+    <!-- 頂部 -->
     <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-0 mb-4">
       <div class="space-y-1">
         <h1 class="text-2xl md:text-3xl font-bold text-blue-800">30天運動挑戰</h1>
@@ -62,37 +58,55 @@
       </div>
     </div>
 
+    <!-- 倒數 + 今日建議 -->
+    <div id="meta-hints" class="mx-auto max-w-lg text-center mb-4">
+      <div id="countdown" class="text-sm text-gray-600"></div>
+      <div id="today-tip" class="text-sm text-gray-600"></div>
+    </div>
+
+    <!-- 目標 -->
     <p class="text-gray-600 text-center mb-4 md:mb-6">目標：30天內完成總計 <span class="font-semibold">2500</span> 下運動</p>
 
-    <!-- 日期 -->
-    <div class="flex items-center justify-center gap-3 md:gap-4 mb-5 md:mb-8">
+    <!-- 日期選擇 -->
+    <div class="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
       <label for="date-select" class="text-base md:text-lg font-medium text-gray-700">選擇日期</label>
       <input type="date" id="date-select"
              class="p-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
 
-    <!-- 操作三鍵（桌機顯示） -->
-    <div class="hidden md:flex flex-wrap items-center justify-center gap-4 mb-8">
+    <!-- 視圖切換 -->
+    <div class="flex items-center justify-center gap-2 mb-3">
+      <button id="view-card"  class="px-3 py-1.5 rounded-lg text-sm bg-gray-900 text-white md:bg-gray-200 md:text-gray-700">卡片</button>
+      <button id="view-table" class="px-3 py-1.5 rounded-lg text-sm bg-gray-200 text-gray-700">表格</button>
+    </div>
+
+    <!-- 三鍵（桌機） -->
+    <div class="hidden md:flex flex-wrap items-center justify-center gap-4 mb-6">
       <button id="btn-squat"  class="bg-blue-600  hover:bg-blue-700  text-white font-semibold py-2 px-4 rounded-lg shadow-md transition hover:scale-105">深蹲</button>
       <button id="btn-pushup" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition hover:scale-105">伏地挺身</button>
       <button id="btn-rowing"  class="bg-red-600   hover:bg-red-700   text-white font-semibold py-2 px-4 rounded-lg shadow-md transition hover:scale-105">划船</button>
     </div>
 
-    <!-- 總進度 -->
-    <div class="overflow-x-auto mb-6 md:mb-8">
-      <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
-        <thead>
-          <tr class="bg-gray-100 text-left text-gray-600 uppercase text-[11px] md:text-sm leading-normal">
-            <th class="py-3 px-4 md:px-6">參賽者</th>
-            <th class="py-3 px-4 md:px-6">深蹲總計</th>
-            <th class="py-3 px-4 md:px-6">伏地挺身總計</th>
-            <th class="py-3 px-4 md:px-6">划船總計</th>
-            <th class="py-3 px-4 md:px-6">總計</th>
-            <th class="py-3 px-4 md:px-6">完成度</th>
-          </tr>
-        </thead>
-        <tbody id="progress-table-body" class="text-gray-700 text-sm font-light"></tbody>
-      </table>
+    <!-- 卡片視圖容器 -->
+    <div id="cards-wrap" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 hidden"></div>
+
+    <!-- 總進度（表格） -->
+    <div id="table-wrap">
+      <div class="overflow-x-auto mb-6 md:mb-8">
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+          <thead>
+            <tr class="bg-gray-100 text-left text-gray-600 uppercase text-[11px] md:text-sm leading-normal">
+              <th class="py-3 px-4 md:px-6">參賽者</th>
+              <th class="py-3 px-4 md:px-6">深蹲總計</th>
+              <th class="py-3 px-4 md:px-6">伏地挺身總計</th>
+              <th class="py-3 px-4 md:px-6">划船總計</th>
+              <th class="py-3 px-4 md:px-6">總計</th>
+              <th class="py-3 px-4 md:px-6">完成度</th>
+            </tr>
+          </thead>
+          <tbody id="progress-table-body" class="text-gray-700 text-sm font-light"></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- 每日紀錄 -->
@@ -103,10 +117,22 @@
         <tbody id="daily-log-table-body" class="text-gray-700 text-sm font-light"></tbody>
       </table>
     </div>
+
+    <!-- 成就徽章（只顯示已解鎖且目前仍符合；同義合併；新→舊） -->
+    <h2 class="text-xl md:text-2xl font-bold mt-8 mb-3 text-gray-800 text-center">成就徽章</h2>
+    <div id="badges-wrap" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+    <p class="text-xs text-gray-500 mt-1 text-center">解鎖新徽章時會自動顯示 🎉</p>
+
+    <!-- Admin 工具（?admin=1 顯示） -->
+    <div id="admin-tools" class="hidden mt-4 text-center">
+      <button id="btn-dedupe" class="px-3 py-1.5 text-xs rounded-md border border-gray-300 hover:bg-gray-100">
+        清理重複徽章＋修復為正確狀態（僅自己）
+      </button>
+    </div>
   </div>
 
-  <!-- 手機：固定底部快操作列（呼叫同一套邏輯） -->
-  <nav class="fixed md:hidden bottom-0 inset-x-0 z-50">
+  <!-- 手機底部快操作列（登入前隱藏） -->
+  <nav id="quickbar" class="fixed md:hidden bottom-0 inset-x-0 z-50 hidden">
     <div class="mx-auto max-w-6xl">
       <div class="m-3 rounded-2xl bg-white/95 backdrop-blur border border-gray-300 p-2 grid grid-cols-3 gap-2 shadow-lg">
         <button class="rounded-xl py-3 font-semibold bg-blue-600 text-white active:scale-[.98]" onclick="document.getElementById('btn-squat').click()">+ 深蹲</button>
@@ -129,7 +155,7 @@
     </div>
   </div>
 
-  <!-- 編輯自己名稱 Modal -->
+  <!-- 改名 Modal -->
   <div id="name-modal" class="modal">
     <div class="modal-content">
       <h3 class="text-xl font-bold mb-4">編輯你的顯示名稱</h3>
@@ -141,12 +167,12 @@
     </div>
   </div>
 
-  <!-- Firebase JS（只用 Firestore） -->
+  <!-- Firebase + App -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import {
       getFirestore, doc, getDoc, setDoc, updateDoc,
-      collection, query, onSnapshot
+      collection, query, onSnapshot, getDocs, deleteDoc
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     /* ======== <<< 換下一輪只需要改這裡 >>> ======== */
@@ -170,13 +196,19 @@
     const db  = getFirestore(app);
 
     // ===== 全域狀態 =====
-    let currentUser = null;           // username
-    let unsubscribe = null;           // participants 監聽
+    let currentUser = null;
+    let unsubscribe = null;
     const TOTAL_GOAL = 2500;
+
+    // ★ 徽章頒發中的臨時鎖，避免並發重複
+    const awardInflight = new Set();
+    let badgesSyncedOnce = false;
 
     // ===== DOM =====
     const loginPage = document.getElementById('login-page');
     const appPage   = document.getElementById('app-page');
+    const quickbar  = document.getElementById('quickbar');
+    const adminTools= document.getElementById('admin-tools');
 
     const loginBtn  = document.getElementById('loginBtn');
     const loginErr  = document.getElementById('login-error');
@@ -213,6 +245,17 @@
     const btnPushup = document.getElementById('btn-pushup');
     const btnRowing = document.getElementById('btn-rowing');
 
+    // 視圖切換
+    let viewMode = 'card'; // 手機預設卡片、桌機在 showApp() 會改表格
+    const cardsWrap   = document.getElementById('cards-wrap');
+    const tableWrap   = document.getElementById('table-wrap');
+    const viewBtnCard = document.getElementById('view-card');
+    const viewBtnTable= document.getElementById('view-table');
+
+    // Admin 開關（?admin=1 顯示工具）
+    const isAdmin = new URLSearchParams(location.search).get('admin') === '1';
+    if (isAdmin) adminTools.classList.remove('hidden');
+
     // ===== 小工具 =====
     async function sha256(str){
       const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
@@ -240,11 +283,61 @@
       const today = clampDateToRange(new Date());
       dateSelect.value = formatDate(today);
 
-      // 標題資訊
       loginRoundLabel.textContent = ROUND_ID;
       loginRangeLabel.textContent = `${CHALLENGE_START} ～ ${CHALLENGE_END}`;
       roundLabel.textContent = ROUND_ID;
       rangeLabel.textContent = `${CHALLENGE_START} ～ ${CHALLENGE_END}`;
+      renderHints();
+    }
+
+    // 倒數＋今日建議
+    function renderHints(){
+      const today = new Date(dateSelect.value);
+      const end   = new Date(CHALLENGE_END);
+      const leftDays = Math.max(0, Math.ceil((end - today)/86400000)+1);
+      document.getElementById('countdown').textContent = `本輪倒數：還有 ${leftDays} 天`;
+      document.getElementById('today-tip').textContent = `今日建議：至少 ${Math.ceil(TOTAL_GOAL/30)} 下`;
+    }
+    dateSelect.addEventListener('change', renderHints);
+
+    // 修仙境界（依總次數）
+    function realmFromTotal(total){
+      const t = Math.max(0, total || 0);
+      const steps = [
+        { id:'qi',        at:100,  name:'練氣期', emoji:'🌱', color:'emerald' },
+        { id:'foundation',at:500,  name:'築基期', emoji:'🧱', color:'amber'   },
+        { id:'core',      at:1000, name:'金丹期', emoji:'🔮', color:'violet'  },
+        { id:'infant',    at:1500, name:'元嬰期', emoji:'👶', color:'sky'     },
+        { id:'spirit',    at:2000, name:'化神期', emoji:'🔥', color:'orange'  },
+        { id:'ascend',    at:2500, name:'飛升',   emoji:'🕊️', color:'amber'   },
+      ];
+      let current = { id:'mortal', at:0, name:'凡人', emoji:'🙂', color:'gray' };
+      let next = steps[0];
+      for (const s of steps){
+        if (t >= s.at) { current = s; next = null; } else { next = s; break; }
+      }
+      const pct    = Math.min(100, (t / 2500) * 100);
+      const remain = next ? Math.max(0, next.at - t) : 0;
+      return { current, next, pct, remain };
+    }
+    function calcStreak(daily, dateStr){
+      const dates = generateDateRange().map(d=>formatDate(d));
+      let i = dates.indexOf(dateStr);
+      let streak = 0;
+      for (; i >= 0; i--){
+        const r = daily?.[dates[i]];
+        const sum = (r?.squat||0) + (r?.pushup||0) + (r?.rowing||0);
+        if (sum > 0) streak++; else break;
+      }
+      return streak;
+    }
+    function sumFromDaily(daily){
+      let tot = 0;
+      for (const k in (daily||{})) {
+        const r = daily[k] || {};
+        tot += (r.squat||0)+(r.pushup||0)+(r.rowing||0);
+      }
+      return tot;
     }
 
     // ===== 帳號登入（自管） =====
@@ -262,7 +355,7 @@
         }
       }
 
-      // 確保本輪的 participant 存在
+      // 確保本輪 participant 存在
       const pRef = doc(db, `rounds/${ROUND_ID}/participants`, username);
       const pSnap = await getDoc(pRef);
       if (!pSnap.exists()){
@@ -281,17 +374,40 @@
       currentUser = username;
     }
 
+    function setView(mode){
+      viewMode = mode;
+      if (mode === 'card') {
+        cardsWrap.classList.remove('hidden');
+        tableWrap.classList.add('hidden');
+        viewBtnCard.classList.add('bg-gray-900','text-white');
+        viewBtnTable.classList.remove('bg-gray-900','text-white');
+      } else {
+        tableWrap.classList.remove('hidden');
+        cardsWrap.classList.add('hidden');
+        viewBtnTable.classList.add('bg-gray-900','text-white');
+        viewBtnCard.classList.remove('bg-gray-900','text-white');
+      }
+    }
+    viewBtnCard?.addEventListener('click', ()=> setView('card'));
+    viewBtnTable?.addEventListener('click', ()=> setView('table'));
+
     function showApp(){
       loginPage.classList.add('hidden');
       appPage.classList.remove('hidden');
+      quickbar?.classList.remove('hidden');   // 手機底部列顯示
       userName.textContent = currentUser || '';
       userIdEl.textContent = currentUser || '';
       initDate();
+      setView(window.innerWidth < 768 ? 'card' : 'table'); // 手機卡片、桌機表格
       startParticipantsListener();
+     // renderBadges(currentUser); // 首次渲染徽章（顯示）
+      // ★ 登入後做一次補發判斷（只跑一次）
+      if (!badgesSyncedOnce) { badgesSyncedOnce = true; checkAndAwardBadgesFor(currentUser); }
     }
     function showLogin(){
       appPage.classList.add('hidden');
       loginPage.classList.remove('hidden');
+      quickbar?.classList.add('hidden');      // 手機底部列隱藏
       if (unsubscribe){ unsubscribe(); unsubscribe = null; }
       initDate();
     }
@@ -310,15 +426,275 @@
           all[docSnap.id] = d;
         });
         renderTables(all);
+        renderCards(all); // 卡片視圖同步更新
+        // ★ 不在這裡頒發徽章，避免重複
       }, (err)=>{
         console.error('監聽失敗：', err);
         alert(`Firestore 監聽失敗：${err.code || err.message}`);
       });
     }
 
-    // ===== Render =====
+    /* ===== 徽章定義（只看 totalFromDaily） ===== */
+    const BADGES = [
+      { id:'realm_qi_100',        emoji:'🌱', title:'練氣期', desc:'累積 100 下',        test:(s)=> s.totalFromDaily>=100 },
+      { id:'realm_found_500',     emoji:'🧱', title:'築基期', desc:'累積 500 下',        test:(s)=> s.totalFromDaily>=500 },
+      { id:'realm_core_1000',     emoji:'🔮', title:'金丹期', desc:'累積 1,000 下',      test:(s)=> s.totalFromDaily>=1000 },
+      { id:'realm_infant_1500',   emoji:'👶', title:'元嬰期', desc:'累積 1,500 下',      test:(s)=> s.totalFromDaily>=1500 },
+      { id:'realm_spirit_2000',   emoji:'🔥', title:'化神期', desc:'累積 2,000 下',      test:(s)=> s.totalFromDaily>=2000 },
+      { id:'realm_ascend_2500',   emoji:'🕊️', title:'飛升',   desc:'累積 2,500 下（封頂）', test:(s)=> s.totalFromDaily>=2500 },
+
+      { id:'streak_3',   emoji:'🧘', title:'小閉關',       desc:'連續 3 日',   test:(s)=> s.streak>=3  },
+      { id:'streak_7',   emoji:'🧘', title:'七日坐忘',     desc:'連續 7 日',   test:(s)=> s.streak>=7  },
+      { id:'streak_14',  emoji:'🧘', title:'十四日入定',   desc:'連續 14 日',  test:(s)=> s.streak>=14 },
+      { id:'streak_21',  emoji:'🧘', title:'二十一日持修', desc:'連續 21 日',  test:(s)=> s.streak>=21 },
+      { id:'streak_30',  emoji:'🧘', title:'三十日圓滿',   desc:'連續 30 日',  test:(s)=> s.streak>=30 },
+    ];
+
+    // === 同義對照表（把舊ID/中文名映射到 canonical）===
+    const BADGE_CANON = {
+      realm_qi_100:      ['realm_qi_100','練氣期','total_100','百煉成鋼'],
+      realm_found_500:   ['realm_found_500','築基期','total_500','五百破關'],
+      realm_core_1000:   ['realm_core_1000','金丹期','total_1000'],
+      realm_infant_1500: ['realm_infant_1500','元嬰期'],
+      realm_spirit_2000: ['realm_spirit_2000','化神期'],
+      realm_ascend_2500: ['realm_ascend_2500','total_2500','本輪完賽'],
+      streak_3:  ['streak_3','小閉關'],
+      streak_7:  ['streak_7','七日坐忘'],
+      streak_14: ['streak_14','十四日入定'],
+      streak_21: ['streak_21','二十一日持修'],
+      streak_30: ['streak_30','三十日圓滿'],
+      first_entry: ['first_entry','新手上路'],
+      day_goal:    ['day_goal','今日達標'],
+    };
+    const CANON_BY_ID_OR_TITLE = {};
+    for (const [canon, arr] of Object.entries(BADGE_CANON)) {
+      for (const key of arr) CANON_BY_ID_OR_TITLE[key] = canon;
+    }
+    const BADGE_INDEX = BADGES.reduce((m,b)=> (m[b.id]=b, m), {});
+
+    // ===== 徽章上下文（用「今天」，不吃 UI 日期）=====
+    function calcContextFromParticipant(p){
+      const daily = p?.dailyLog || {};
+      const today = clampDateToRange(new Date());
+      const todayStr = formatDate(today);
+
+      const recToday = daily[todayStr] || {squat:0,pushup:0,rowing:0};
+      const todaySum = (recToday.squat||0)+(recToday.pushup||0)+(recToday.rowing||0);
+
+      // 由 daily 回推總數 —— 唯一真相
+      let totalFromDaily = 0;
+      for (const k in daily) {
+        const r = daily[k] || {};
+        totalFromDaily += (r.squat||0)+(r.pushup||0)+(r.rowing||0);
+      }
+
+      // 連續天數（從今天往回）
+      const dates = generateDateRange().map(d=>formatDate(d));
+      let i = dates.indexOf(todayStr), streak = 0;
+      for (; i >= 0; i--){
+        const r = daily[dates[i]];
+        const s = (r?.squat||0)+(r?.pushup||0)+(r?.rowing||0);
+        if (s > 0) streak++; else break;
+      }
+      return { totalFromDaily, todaySum, streak, todayStr };
+    }
+
+    async function getEarnedBadgeIds(userId){
+      const list = await getDocs(collection(db, `rounds/${ROUND_ID}/participants/${userId}/badges`));
+      return new Set(list.docs.map(d=>d.id));
+    }
+    function _ts(x){ return x?.toMillis ? x.toMillis() : Date.parse(x || 0) || 0; }
+    async function getEarnedBadgeList(userId){
+      const qs = await getDocs(collection(db, `rounds/${ROUND_ID}/participants/${userId}/badges`));
+      const bucket = new Map(); // canon -> {id, data, t}
+      qs.forEach(docSnap=>{
+        const data = docSnap.data() || {};
+        const rawId   = docSnap.id;
+        const rawMeta = data.id || data.title || rawId;
+        const canon   = CANON_BY_ID_OR_TITLE[rawId]
+                     || CANON_BY_ID_OR_TITLE[rawMeta]
+                     || CANON_BY_ID_OR_TITLE[data.title]
+                     || rawId;
+        const t = _ts(data.earnedAt);
+        const cur = bucket.get(canon);
+        if (!cur || t > cur.t) bucket.set(canon, { id: canon, data, t });
+      });
+      return Array.from(bucket.values())
+                  .sort((a,b)=> b.t - a.t)
+                  .map(v=> ({ id: v.id, ...v.data }));
+    }
+
+    async function awardBadge(userId, badge){
+      await setDoc(doc(db, `rounds/${ROUND_ID}/participants/${userId}/badges`, badge.id), {
+        id: badge.id, title: badge.title, desc: badge.desc, earnedAt: new Date().toISOString()
+      }, { merge: true });
+    }
+
+    // ★ 只在「登入一次」與「寫入後」呼叫；先校正 total，再重算 ctx
+    async function checkAndAwardBadgesFor(userId){
+      if (!userId) return;
+
+      const ref = doc(db, `rounds/${ROUND_ID}/participants`, userId);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) return;
+
+      const p = snap.data();
+      if (p.dailyLog && typeof p.dailyLog === 'string'){
+        try{ p.dailyLog = JSON.parse(p.dailyLog); }catch{ p.dailyLog = {}; }
+      }
+
+      // 先算一次
+      let ctx = calcContextFromParticipant(p);
+
+      // 若 legacy 的 total 與 daily 合計不一致→以 daily 為準回填
+      if ((p.total||0) !== ctx.totalFromDaily){
+        await setDoc(ref, { total: ctx.totalFromDaily, updatedAt: new Date().toISOString() }, { merge:true });
+        // ★ 立即重算，避免用到舊的 total
+        ctx = calcContextFromParticipant({ ...p, total: ctx.totalFromDaily });
+      }
+
+      const owned = await getEarnedBadgeIds(userId);
+      const toAward = BADGES
+        .filter(b => !owned.has(b.id) && b.test(ctx))
+        .filter(b => !awardInflight.has(b.id));
+
+      if (!toAward.length) return;
+
+      for (const b of toAward){
+        awardInflight.add(b.id);
+        try { await awardBadge(userId, b); }
+        finally { awardInflight.delete(b.id); }
+      }
+
+      toast(`解鎖徽章：${toAward.map(b=>`${b.emoji} ${b.title}`).join('、')}`);
+      renderBadges(userId);
+    }
+
+    function toast(msg){
+      const el = document.createElement('div');
+      el.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 bg-black text-white text-sm px-4 py-2 rounded-lg shadow-lg z-[9999]';
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(()=>{ el.remove(); }, 2500);
+    }
+
+    // 成就區：只顯示「已解鎖」且「目前仍符合條件」的徽章（同義合併，新→舊）
+    async function renderBadges(userId){
+      const wrap = document.getElementById('badges-wrap');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+
+      // 目前可得（依每日加總與連續天數）
+      const pSnap = await getDoc(doc(db, `rounds/${ROUND_ID}/participants`, userId));
+      let p = pSnap.data() || {};
+      if (p.dailyLog && typeof p.dailyLog === 'string'){
+        try{ p.dailyLog = JSON.parse(p.dailyLog); }catch{ p.dailyLog = {}; }
+      }
+      const ctx = calcContextFromParticipant(p);
+      const eligible = new Set(BADGES.filter(b => b.test(ctx)).map(b => b.id));
+
+      // 已解鎖（做同義合併與去重）
+      const earned = await getEarnedBadgeList(userId);
+
+      // 僅顯示「已解鎖且目前仍符合」的徽章
+      const show = earned.filter(it => eligible.has(it.id));
+
+      if (!show.length){
+        wrap.innerHTML = `<div class="text-center text-sm text-gray-500 py-3">目前尚未解鎖任何徽章</div>`;
+        return;
+      }
+
+      for (const it of show){
+        const meta = BADGE_INDEX[it.id] || { emoji:'🏅', title: it.title || it.id, desc: it.desc || '' };
+        const card = document.createElement('div');
+        card.className = 'p-3 rounded-xl border border-blue-300 bg-blue-50 flex items-start gap-3';
+        card.innerHTML = `
+          <div class="text-2xl">${meta.emoji}</div>
+          <div class="flex-1">
+            <div class="text-sm font-semibold text-blue-700">${meta.title}</div>
+            <div class="text-xs text-gray-600">${meta.desc || ''}</div>
+            <div class="mt-1 text-[11px] text-blue-600">已解鎖</div>
+          </div>`;
+        wrap.appendChild(card);
+      }
+    }
+
+    // === 去重＆修復：把重複徽章整併為 canonical，並刪掉不再符合條件的徽章 ===
+    function toCanonFromDoc(docSnap){
+      const data = docSnap.data() || {};
+      const rawId = docSnap.id;
+      const rawMeta = data.id || data.title || rawId;
+      const canon = CANON_BY_ID_OR_TITLE[rawId]
+                 || CANON_BY_ID_OR_TITLE[rawMeta]
+                 || CANON_BY_ID_OR_TITLE[data.title]
+                 || rawId;
+      return { canon, data };
+    }
+    async function dedupeBadgesFor(userId){
+      const col = collection(db, `rounds/${ROUND_ID}/participants/${userId}/badges`);
+      const qs  = await getDocs(col);
+
+      const keep = new Map(); // canon -> {id, t}
+      qs.forEach(docSnap=>{
+        const { canon, data } = toCanonFromDoc(docSnap);
+        const t = _ts(data.earnedAt);
+        const cur = keep.get(canon);
+        if (!cur || t > cur.t) keep.set(canon, { id: docSnap.id, t });
+      });
+
+      for (const docSnap of qs.docs){
+        const { canon, data } = toCanonFromDoc(docSnap);
+        const keepRec = keep.get(canon);
+
+        if (docSnap.id !== keepRec.id){
+          await deleteDoc(docSnap.ref);
+          continue;
+        }
+        if (docSnap.id !== canon){
+          await setDoc(doc(db, `rounds/${ROUND_ID}/participants/${userId}/badges`, canon),
+                       { ...data, id: canon }, { merge:true });
+          await deleteDoc(docSnap.ref);
+        }
+      }
+    }
+    async function repairBadges(userId){
+      const partRef = doc(db, `rounds/${ROUND_ID}/participants`, userId);
+      const snap = await getDoc(partRef);
+      if (!snap.exists()) return;
+
+      let p = snap.data();
+      if (p.dailyLog && typeof p.dailyLog === 'string'){
+        try{ p.dailyLog = JSON.parse(p.dailyLog); }catch{ p.dailyLog = {}; }
+      }
+      const ctx = calcContextFromParticipant(p);
+      const eligible = new Set(BADGES.filter(b => b.test(ctx)).map(b => b.id));
+
+      const col = collection(db, `rounds/${ROUND_ID}/participants/${userId}/badges`);
+      const qs  = await getDocs(col);
+
+      for (const docSnap of qs.docs){
+        const data = docSnap.data() || {};
+        const rawId = docSnap.id;
+        const canon = CANON_BY_ID_OR_TITLE[rawId] || CANON_BY_ID_OR_TITLE[data.id] || CANON_BY_ID_OR_TITLE[data.title] || rawId;
+        if (!eligible.has(canon)){
+          await deleteDoc(docSnap.ref);
+        }
+      }
+
+      await checkAndAwardBadgesFor(userId); // 依正確條件補發
+      await renderBadges(userId);
+      toast('徽章已修復為與實際紀錄一致');
+    }
+
+    // Admin 按鈕事件：去重 + 修復
+    document.getElementById('btn-dedupe')?.addEventListener('click', async ()=>{
+      await dedupeBadgesFor(currentUser);
+      await repairBadges(currentUser);
+    });
+
+    // ===== 表格渲染 =====
     function renderTables(all){
-      // Progress
+      // 排序
       progressTableBody.innerHTML='';
       const ids = Object.keys(all).sort((a,b)=>{
         const ta=(all[a].total||0), tb=(all[b].total||0);
@@ -326,6 +702,7 @@
         return (all[a].name||a).localeCompare(all[b].name||b,'zh-Hant');
       });
 
+      // 總進度
       ids.forEach(id=>{
         const p = all[id];
         const completion = ((p.total/TOTAL_GOAL)*100).toFixed(1);
@@ -350,7 +727,7 @@
         progressTableBody.appendChild(tr);
       });
 
-      // 綁定自己那列的「編輯」
+      // 綁定改名
       progressTableBody.querySelectorAll('button[data-edit]').forEach(btn=>{
         btn.addEventListener('click', ()=>{
           if (btn.dataset.edit !== currentUser) return;
@@ -360,7 +737,7 @@
         });
       });
 
-      // Daily
+      // 每日
       dailyLogTableHead.innerHTML='';
       dailyLogTableBody.innerHTML='';
       const dates = generateDateRange();
@@ -379,7 +756,12 @@
       });
       dailyLogTableHead.appendChild(headerRow);
 
-      ids.forEach(id=>{
+      const ids2 = Object.keys(all).sort((a,b)=>{
+        const ta=(all[a].name||a), tb=(all[b].name||b);
+        return ta.localeCompare(tb,'zh-Hant');
+      });
+
+      ids2.forEach(id=>{
         const p = all[id];
         const tr=document.createElement('tr');
         tr.className='border-b border-gray-200 hover:bg-gray-50';
@@ -402,6 +784,121 @@
 
       // 更新三鍵顯示（僅自己）
       updateExerciseButtons(all[currentUser]);
+
+      // 不在這裡頒發徽章（避免重複）；但重新渲染 OK
+      renderBadges(currentUser);
+    }
+
+    // ===== 卡片視圖渲染（最高境界 + 最高連續）=====
+    function renderCards(all){
+      if (!cardsWrap) return;
+      cardsWrap.innerHTML = '';
+
+      const ids = Object.keys(all).sort((a,b)=>{
+        const ta=(all[a].total||0), tb=(all[b].total||0);
+        if (tb!==ta) return tb-ta;
+        return (all[a].name||a).localeCompare(all[b].name||b,'zh-Hant');
+      });
+
+      const todayStr = dateSelect.value;
+
+      ids.forEach((id, idx)=>{
+        const p = all[id];
+        const daily = p.dailyLog || {};
+        const today = daily[todayStr] || {squat:0,pushup:0,rowing:0};
+        const todaySum = (today.squat||0)+(today.pushup||0)+(today.rowing||0);
+
+        const total = (Number.isFinite(p.total) && p.total >= 0) ? p.total : sumFromDaily(daily);
+        const streak = calcStreak(daily, todayStr);
+        const realm  = realmFromTotal(total);
+
+        const theme = {
+          emerald:{ chip:'bg-emerald-50 text-emerald-700 border border-emerald-200', bar:'bg-emerald-500', ring:'ring-emerald-200' },
+          amber:  { chip:'bg-amber-50 text-amber-700 border border-amber-200',       bar:'bg-amber-500',   ring:'ring-amber-200'   },
+          violet: { chip:'bg-violet-50 text-violet-700 border border-violet-200',    bar:'bg-violet-500',  ring:'ring-violet-200'  },
+          sky:    { chip:'bg-sky-50 text-sky-700 border border-sky-200',             bar:'bg-sky-500',     ring:'ring-sky-200'     },
+          orange: { chip:'bg-orange-50 text-orange-700 border border-orange-200',    bar:'bg-orange-500',  ring:'ring-orange-200'  },
+          gray:   { chip:'bg-gray-100 text-gray-700 border border-gray-200',         bar:'bg-gray-500',    ring:'ring-gray-200'    }
+        }[realm.current.color] || { chip:'bg-gray-100 text-gray-700 border border-gray-200', bar:'bg-gray-500', ring:'ring-gray-200' };
+
+        // —— 只取「最高」境界徽章
+        const realmSteps = [
+          {at:100,  txt:'🌱 練氣'},
+          {at:500,  txt:'🧱 築基'},
+          {at:1000, txt:'🔮 金丹'},
+          {at:1500, txt:'👶 元嬰'},
+          {at:2000, txt:'🔥 化神'},
+          {at:2500, txt:'🕊️ 飛升'},
+        ];
+        let realmTop = null;
+        for (const s of realmSteps) { if (total >= s.at) realmTop = s; else break; }
+        const realmBadge = realmTop ? [realmTop.txt] : [];
+
+        // —— 只取「最高」連續天數獎勵
+        const streakSteps = [
+          {d:30, txt:'🧘 30日'},
+          {d:21, txt:'🧘 21日'},
+          {d:14, txt:'🧘 14日'},
+          {d:7,  txt:'🧘 7日'},
+          {d:3,  txt:'🧘 3日'},
+        ];
+        const streakTop  = streakSteps.find(s => streak >= s.d);
+        const streakBadge = streakTop ? [streakTop.txt] : [];
+
+        const badges = [...realmBadge, ...streakBadge];
+
+        const card = document.createElement('article');
+        card.className = `relative rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200 ${theme.ring}`;
+
+        card.innerHTML = `
+          <div class="absolute -top-2 -right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded-full">#${idx+1}</div>
+          <header class="flex items-center gap-3">
+            <div class="h-10 w-10 rounded-xl bg-gray-100 grid place-items-center text-gray-700 font-bold">${(p.name||id).slice(0,1).toUpperCase()}</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <h3 class="font-semibold truncate">${p.name||id}</h3>
+                <span class="px-2 py-0.5 text-xs rounded-full ${theme.chip}">
+                  ${realm.current.emoji} ${realm.current.name}
+                </span>
+              </div>
+              <p class="text-xs text-gray-500">總計 ${total} 下 · 今日 ${todaySum} · 連續 ${streak} 天</p>
+            </div>
+          </header>
+
+          <div class="mt-3">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>修為 ${total} / 2,500</span>
+              <span>${realm.next ? `距「${realm.next.name}」還差 ${realm.remain}` : '已封頂'}</span>
+            </div>
+            <div class="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
+              <div class="h-full ${theme.bar}" style="width:${realm.pct.toFixed(2)}%"></div>
+            </div>
+          </div>
+
+          <div class="mt-3 flex items-center gap-2 flex-wrap">
+            ${badges.map(txt => `
+              <span class="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${theme.chip} shadow-sm">${txt}</span>
+            `).join('')}
+          </div>
+
+          <div class="mt-3 md:hidden">
+            <button class="w-full py-2 rounded-xl ${theme.bar} text-white font-medium active:scale-[.98]" data-record="${id}">
+              記錄今天
+            </button>
+          </div>
+        `;
+
+        const actBtn = card.querySelector('button[data-record]');
+        if (actBtn) {
+          if (id === currentUser) {
+            actBtn.addEventListener('click', ()=> document.getElementById('btn-squat').click());
+          } else {
+            actBtn.disabled = true;
+            actBtn.classList.add('opacity-50','cursor-not-allowed');
+          }
+        }
+        cardsWrap.appendChild(card);
+      });
     }
 
     function updateExerciseButtons(self){
@@ -445,6 +942,9 @@
         dailyLog: JSON.stringify(daily),
         updatedAt: new Date().toISOString()
       }, { merge:true });
+
+      // ★ 寫入後做一次頒發判斷（單一入口）
+      await checkAndAwardBadgesFor(currentUser);
     }
 
     async function saveOwnName(newName){
@@ -453,28 +953,6 @@
         updatedAt: new Date().toISOString()
       });
       userName.textContent = newName;
-    }
-
-    // ===== Modals =====
-    function showRepsModal(type, initial){
-      return new Promise((resolve)=>{
-        repsModalTitle.textContent=`編輯${type}數量`;
-        repsModalText.textContent=`請輸入你在 ${dateSelect.value} 完成的 ${type} 數量：`;
-        repsInput.value = initial ?? '';
-        repsModal.style.display='flex';
-        repsInput.focus();
-
-        const onConfirm=()=>{ repsModal.style.display='none';
-          const v=parseInt(repsInput.value,10);
-          resolve(Number.isFinite(v)&&v>=0 ? v : null); cleanup(); };
-        const onCancel =()=>{ repsModal.style.display='none'; resolve(null); cleanup(); };
-        function cleanup(){
-          repsModalConfirm.removeEventListener('click',onConfirm);
-          repsModalCancel .removeEventListener('click',onCancel);
-        }
-        repsModalConfirm.addEventListener('click',onConfirm);
-        repsModalCancel .addEventListener('click',onCancel);
-      });
     }
 
     // ===== 事件 =====
@@ -520,6 +998,27 @@
       await saveReps('rowing', dateSelect.value, v);
     });
 
+    function showRepsModal(type, initial){
+      return new Promise((resolve)=>{
+        repsModalTitle.textContent=`編輯${type}數量`;
+        repsModalText.textContent=`請輸入你在 ${dateSelect.value} 完成的 ${type} 數量：`;
+        repsInput.value = initial ?? '';
+        repsModal.style.display='flex';
+        repsInput.focus();
+
+        const onConfirm=()=>{ repsModal.style.display='none';
+          const v=parseInt(repsInput.value,10);
+          resolve(Number.isFinite(v)&&v>=0 ? v : null); cleanup(); };
+        const onCancel =()=>{ repsModal.style.display='none'; resolve(null); cleanup(); };
+        function cleanup(){
+          repsModalConfirm.removeEventListener('click',onConfirm);
+          repsModalCancel .removeEventListener('click',onCancel);
+        }
+        repsModalConfirm.addEventListener('click',onConfirm);
+        repsModalCancel .addEventListener('click',onCancel);
+      });
+    }
+
     nameModalConfirm.addEventListener('click', async ()=>{
       const v = nameInput.value.trim();
       if (!v) return;
@@ -528,9 +1027,7 @@
     });
     nameModalCancel.addEventListener('click', ()=> nameModal.style.display='none');
 
-    dateSelect.addEventListener('change', ()=>{/* 數值會在 snapshot 後刷新 */});
-
-    // ===== 自動登入（綁定 round）=====
+    // ===== 自動登入 =====
     (async function boot(){
       const savedU = localStorage.getItem('currentUser');
       const savedR = localStorage.getItem('currentRoundId');
