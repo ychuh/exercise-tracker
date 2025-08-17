@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30天運動挑戰追蹤器</title>
+    <!-- 使用 Tailwind CSS 進行快速美觀的排版 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        /* Custom styles for daily log table */
+        .daily-log-table-container {
+            overflow-x: auto;
+        }
+        .daily-log-table th, .daily-log-table td {
+            min-width: 80px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="p-6 md:p-12 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-5xl w-full">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+            <h1 class="text-3xl font-bold mb-2 text-center text-blue-800">30天運動挑戰追蹤</h1>
+            <p id="current-date" class="text-gray-600 text-sm md:text-base"></p>
+        </div>
+        <p class="text-gray-600 text-center mb-6">目標：30天內完成總計 2500 下運動</p>
+
+        <!-- 參賽者選擇與數據輸入區 -->
+        <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-8">
+            <div class="flex items-center gap-2">
+                <label for="participant-select" class="text-lg font-medium text-gray-700">選擇參賽者:</label>
+                <select id="participant-select" class="p-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="user1">參賽者 A</option>
+                    <option value="user2">參賽者 B</option>
+                    <option value="user3">參賽者 C</option>
+                    <option value="user4">參賽者 D</option>
+                </select>
+            </div>
+            
+            <div class="flex gap-4">
+                <!-- 運動輸入按鈕 -->
+                <button id="btn-squat" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition transform hover:scale-105">
+                    深蹲
+                </button>
+                <button id="btn-pushup" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition transform hover:scale-105">
+                    伏地挺身
+                </button>
+                <button id="btn-rowing" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition transform hover:scale-105">
+                    划船
+                </button>
+            </div>
+        </div>
+
+        <!-- 總進度表格 -->
+        <div class="overflow-x-auto mb-8">
+            <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+                <thead>
+                    <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left">參賽者</th>
+                        <th class="py-3 px-6 text-left">深蹲總計</th>
+                        <th class="py-3 px-6 text-left">伏地挺身總計</th>
+                        <th class="py-3 px-6 text-left">划船總計</th>
+                        <th class="py-3 px-6 text-left">總計</th>
+                        <th class="py-3 px-6 text-left">完成度</th>
+                    </tr>
+                </thead>
+                <tbody id="progress-table-body" class="text-gray-600 text-sm font-light">
+                    <!-- 表格資料將由 JavaScript 填充 -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 每日紀錄表格 -->
+        <h2 class="text-2xl font-bold mb-4 text-gray-800 text-center">每日運動紀錄 (8/16 - 9/15)</h2>
+        <div class="daily-log-table-container">
+            <table id="daily-log-table" class="bg-white border border-gray-200 rounded-lg shadow-sm w-full">
+                <thead id="daily-log-table-head" class="bg-gray-100 text-gray-600 uppercase text-xs leading-normal">
+                    <!-- 表頭將由 JavaScript 填充 -->
+                </thead>
+                <tbody id="daily-log-table-body" class="text-gray-600 text-sm font-light">
+                    <!-- 表格資料將由 JavaScript 填充 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 在本地儲存中使用的鍵名
+        const STORAGE_KEY = 'exerciseChallengeDataV2';
+        // 挑戰總目標
+        const TOTAL_GOAL = 2500;
+        
+        // 預設參賽者資料結構
+        const initialData = {
+            'user1': { name: '參賽者 A', total: 0, squat: 0, pushup: 0, rowing: 0, dailyLog: {} },
+            'user2': { name: '參賽者 B', total: 0, squat: 0, pushup: 0, rowing: 0, dailyLog: {} },
+            'user3': { name: '參賽者 C', total: 0, squat: 0, pushup: 0, rowing: 0, dailyLog: {} },
+            'user4': { name: '參賽者 D', total: 0, squat: 0, pushup: 0, rowing: 0, dailyLog: {} },
+        };
+
+        // 獲取 DOM 元素
+        const currentDateElem = document.getElementById('current-date');
+        const participantSelect = document.getElementById('participant-select');
+        const btnSquat = document.getElementById('btn-squat');
+        const btnPushup = document.getElementById('btn-pushup');
+        const btnRowing = document.getElementById('btn-rowing');
+        const progressTableBody = document.getElementById('progress-table-body');
+        const dailyLogTableHead = document.getElementById('daily-log-table-head');
+        const dailyLogTableBody = docum
