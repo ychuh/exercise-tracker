@@ -153,6 +153,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection, query, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
         // 從你的 Firebase 專案中貼上 firebaseConfig 物件
         const myFirebaseConfig = {
@@ -177,7 +178,8 @@
         let unsubscribe = null;
         let db = null;
         let auth = null;
-        
+        let app = null;
+
         // 在本地儲存中使用的鍵名
         const STORAGE_KEY = 'exerciseChallengeDataV2';
         // 挑戰總目標
@@ -250,7 +252,12 @@
                     const data = doc.data();
                     // 將 dailyLog 欄位從 JSON 字串轉換為物件
                     if (data.dailyLog && typeof data.dailyLog === 'string') {
-                        data.dailyLog = JSON.parse(data.dailyLog);
+                        try {
+                            data.dailyLog = JSON.parse(data.dailyLog);
+                        } catch (e) {
+                            console.error("解析 dailyLog JSON 失敗:", e);
+                            data.dailyLog = {};
+                        }
                     }
                     fetchedData[doc.id] = data;
                 });
@@ -465,7 +472,7 @@
             return new Promise((resolve, reject) => {
                 repsModal.style.display = 'flex';
                 repsModalTitle.textContent = `編輯${exerciseType}數量`;
-                const participantName = challengeData[participantSelect.value].name;
+                const participantName = challengeData[participantSelect.value]?.name || '參賽者';
                 const selectedDate = dateSelect.value;
                 repsModalText.textContent = `請輸入 ${participantName} 在 ${selectedDate} 完成的 ${exerciseType} 數量：`;
                 repsInput.value = initialValue !== undefined ? initialValue : '';
@@ -590,7 +597,7 @@
                 await saveDataToFirestore(participantId);
             }
         }
-
+        
         // 將編輯和移除函數暴露給全局，以便 HTML 中的 `onclick` 使用
         window.editParticipantName = editParticipantName;
         window.removeParticipant = removeParticipant;
@@ -617,9 +624,10 @@
             // 進行 Firebase 認證
             try {
                 // 初始化 Firebase 應用程式
-                const app = initializeApp(canvasConfig.firebaseConfig);
+                app = initializeApp(canvasConfig.firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
+                const analytics = getAnalytics(app);
 
                 if (canvasConfig.initialAuthToken) {
                     const userCredential = await signInWithCustomToken(auth, canvasConfig.initialAuthToken);
@@ -631,7 +639,7 @@
                 userIdElem.textContent = userId;
                 
                 // 載入資料並即時監聽
-                loadDataFromFirestore(db, canvasConfig.appId);
+                loadDataFromFirestore();
             } catch (error) {
                 console.error("Firebase 認證失敗:", error);
                 userIdElem.textContent = "認證失敗";
