@@ -512,13 +512,13 @@
             const selectedDate = dateSelect.value;
             
             // 獲取當前次數
-            const dailyData = challengeData[participantId].dailyLog[selectedDate] || { squat: 0, pushup: 0, rowing: 0 };
+            const dailyData = challengeData[participantId]?.dailyLog[selectedDate] || { squat: 0, pushup: 0, rowing: 0 };
             const currentReps = dailyData[exerciseType] || 0;
 
             const newReps = await showRepsModal(exerciseType, currentReps);
 
             if (newReps !== null) {
-                const oldReps = challengeData[participantId].dailyLog[selectedDate]?.[exerciseType] || 0;
+                const oldReps = challengeData[participantId]?.dailyLog[selectedDate]?.[exerciseType] || 0;
                 const diff = newReps - oldReps;
 
                 // 確保每日紀錄物件存在
