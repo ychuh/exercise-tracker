@@ -2,48 +2,52 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>運動挑戰追蹤器（分輪次 / Username-Password）</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body{font-family:'Inter',sans-serif;background:#f3f4f6;color:#1f2937}
+    body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans TC',sans-serif;background:#f3f4f6;color:#1f2937}
     .daily-log-table-container{overflow-x:auto}
-    .daily-log-table th,.daily-log-table td{min-width:80px;text-align:center}
+    .daily-log-table th,.daily-log-table td{min-width:72px;text-align:center}
     .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;
            background:rgba(0,0,0,.4);justify-content:center;align-items:center}
-    .modal-content{background:#fff;margin:auto;padding:20px;border-radius:12px;width:90%;max-width:420px;
-                   box-shadow:0 4px 6px rgba(0,0,0,.1)}
+    .modal-content{background:#fff;margin:auto;padding:20px;border-radius:12px;width:92%;max-width:420px;
+                   box-shadow:0 8px 24px rgba(0,0,0,.15)}
+    /* 手機更緊湊 */
+    @media (max-width: 767px){
+      .card { border-radius: 16px; }
+      .min-w-mobile { min-width: 640px; }
+    }
   </style>
 </head>
-<body class="p-6 md:p-12 min-h-screen flex items-center justify-center">
+<body class="p-4 md:p-10 min-h-screen flex items-start md:items-center justify-center">
 
-  <!-- 登入區 -->
-  <div id="login-page" class="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
-    <h1 class="text-2xl font-bold mb-6 text-blue-800 text-center">運動挑戰追蹤器</h1>
-    <div class="text-sm text-gray-600 mb-4 text-center">
+  <!-- 登入區（手機寬度友好） -->
+  <div id="login-page" class="w-full max-w-md p-6 md:p-8 bg-white rounded-2xl shadow-xl card">
+    <h1 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-blue-800 text-center">運動挑戰追蹤器</h1>
+    <div class="text-xs md:text-sm text-gray-600 mb-4 text-center">
       <div>目前輪次：<span id="login-round-label" class="font-semibold"></span></div>
       <div>日期範圍：<span id="login-range-label"></span></div>
     </div>
     <div class="space-y-3">
-      <input id="username" placeholder="使用者名稱（參賽者名稱）"
+      <input id="username" placeholder="使用者名稱（英數._-）"
              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
       <input id="password" type="password" placeholder="密碼"
              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-      <button id="loginBtn" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+      <button id="loginBtn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg active:scale-[.98]">
         登入（無帳號會自動建立）
       </button>
       <p id="login-error" class="text-sm text-red-600 h-5"></p>
     </div>
-    <p class="text-xs text-gray-500 mt-4">此登入為前端自管帳密，不使用 Firebase Authentication。</p>
+    <p class="text-[11px] md:text-xs text-gray-500 mt-4 text-center">此登入為前端自管帳密，不使用 Firebase Authentication。</p>
   </div>
 
   <!-- 主頁 -->
-  <div id="app-page" class="hidden bg-white p-8 rounded-2xl shadow-xl max-w-6xl w-full">
-    <div class="flex flex-col md:flex-row justify-between items-center mb-4">
-      <div>
-        <h1 class="text-3xl font-bold text-blue-800">
-          30天運動挑戰
-        </h1>
+  <div id="app-page" class="hidden bg-white p-4 md:p-8 rounded-2xl shadow-xl max-w-6xl w-full card">
+    <!-- 頂部：手機更緊湊 -->
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-0 mb-4">
+      <div class="space-y-1">
+        <h1 class="text-2xl md:text-3xl font-bold text-blue-800">30天運動挑戰</h1>
         <div class="text-sm text-gray-600">
           目前輪次：<span id="round-label" class="font-semibold"></span>，
           日期：<span id="range-label"></span>
@@ -58,55 +62,65 @@
       </div>
     </div>
 
-    <p class="text-gray-600 text-center mb-6">目標：30天內完成總計 2500 下運動</p>
+    <p class="text-gray-600 text-center mb-4 md:mb-6">目標：30天內完成總計 <span class="font-semibold">2500</span> 下運動</p>
 
     <!-- 日期 -->
-    <div class="flex items-center justify-center gap-4 mb-8">
-      <div class="flex items-center gap-2">
-        <label for="date-select" class="text-lg font-medium text-gray-700">選擇日期:</label>
-        <input type="date" id="date-select" class="p-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
+    <div class="flex items-center justify-center gap-3 md:gap-4 mb-5 md:mb-8">
+      <label for="date-select" class="text-base md:text-lg font-medium text-gray-700">選擇日期</label>
+      <input type="date" id="date-select"
+             class="p-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
 
-    <!-- 操作三鍵 -->
-    <div class="flex flex-wrap items-center justify-center gap-4 mb-8">
+    <!-- 操作三鍵（桌機顯示） -->
+    <div class="hidden md:flex flex-wrap items-center justify-center gap-4 mb-8">
       <button id="btn-squat"  class="bg-blue-600  hover:bg-blue-700  text-white font-semibold py-2 px-4 rounded-lg shadow-md transition hover:scale-105">深蹲</button>
       <button id="btn-pushup" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition hover:scale-105">伏地挺身</button>
       <button id="btn-rowing"  class="bg-red-600   hover:bg-red-700   text-white font-semibold py-2 px-4 rounded-lg shadow-md transition hover:scale-105">划船</button>
     </div>
 
-    <!-- 總進度（所有人；只有自己那列可 [編輯] 名稱） -->
-    <div class="overflow-x-auto mb-8">
+    <!-- 總進度 -->
+    <div class="overflow-x-auto mb-6 md:mb-8">
       <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
         <thead>
-          <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal">
-            <th class="py-3 px-6 text-left">參賽者</th>
-            <th class="py-3 px-6 text-left">深蹲總計</th>
-            <th class="py-3 px-6 text-left">伏地挺身總計</th>
-            <th class="py-3 px-6 text-left">划船總計</th>
-            <th class="py-3 px-6 text-left">總計</th>
-            <th class="py-3 px-6 text-left">完成度</th>
+          <tr class="bg-gray-100 text-left text-gray-600 uppercase text-[11px] md:text-sm leading-normal">
+            <th class="py-3 px-4 md:px-6">參賽者</th>
+            <th class="py-3 px-4 md:px-6">深蹲總計</th>
+            <th class="py-3 px-4 md:px-6">伏地挺身總計</th>
+            <th class="py-3 px-4 md:px-6">划船總計</th>
+            <th class="py-3 px-4 md:px-6">總計</th>
+            <th class="py-3 px-4 md:px-6">完成度</th>
           </tr>
         </thead>
-        <tbody id="progress-table-body" class="text-gray-600 text-sm font-light"></tbody>
+        <tbody id="progress-table-body" class="text-gray-700 text-sm font-light"></tbody>
       </table>
     </div>
 
     <!-- 每日紀錄 -->
-    <h2 class="text-2xl font-bold mb-4 text-gray-800 text-center">每日運動紀錄</h2>
+    <h2 class="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-gray-800 text-center">每日運動紀錄</h2>
     <div class="daily-log-table-container">
       <table id="daily-log-table" class="bg-white border border-gray-200 rounded-lg shadow-sm w-full">
-        <thead id="daily-log-table-head" class="bg-gray-100 text-gray-600 uppercase text-xs leading-normal"></thead>
-        <tbody id="daily-log-table-body" class="text-gray-600 text-sm font-light"></tbody>
+        <thead id="daily-log-table-head" class="bg-gray-100 text-gray-600 uppercase text-[11px] md:text-xs leading-normal"></thead>
+        <tbody id="daily-log-table-body" class="text-gray-700 text-sm font-light"></tbody>
       </table>
     </div>
   </div>
+
+  <!-- 手機：固定底部快操作列（呼叫同一套邏輯） -->
+  <nav class="fixed md:hidden bottom-0 inset-x-0 z-50">
+    <div class="mx-auto max-w-6xl">
+      <div class="m-3 rounded-2xl bg-white/95 backdrop-blur border border-gray-300 p-2 grid grid-cols-3 gap-2 shadow-lg">
+        <button class="rounded-xl py-3 font-semibold bg-blue-600 text-white active:scale-[.98]" onclick="document.getElementById('btn-squat').click()">+ 深蹲</button>
+        <button class="rounded-xl py-3 font-semibold bg-green-600 text-white active:scale-[.98]" onclick="document.getElementById('btn-pushup').click()">+ 伏地</button>
+        <button class="rounded-xl py-3 font-semibold bg-red-600 text-white active:scale-[.98]" onclick="document.getElementById('btn-rowing').click()">+ 划船</button>
+      </div>
+    </div>
+  </nav>
 
   <!-- 數量 Modal -->
   <div id="reps-modal" class="modal">
     <div class="modal-content">
       <h3 id="reps-modal-title" class="text-xl font-bold mb-4">輸入數量</h3>
-      <p id="reps-modal-text" class="mb-4 text-gray-700"></p>
+      <p id="reps-modal-text" class="mb-3 text-gray-700 text-sm"></p>
       <input type="number" id="reps-input" class="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4" placeholder="請輸入數量">
       <div class="flex justify-end gap-2">
         <button id="reps-modal-cancel"  class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg">取消</button>
@@ -136,23 +150,20 @@
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     /* ======== <<< 換下一輪只需要改這裡 >>> ======== */
-    // 第二輪（示例）：2025-09-16 ~ 2025-10-15
-    // 你要別的日期就把下面兩行改掉；ROUND_ID 建議跟著改成 "YYYY-MM-DD_YYYY-MM-DD"
     const CHALLENGE_START = '2025-08-16';
     const CHALLENGE_END   = '2025-09-15';
     const ROUND_ID        = `第二輪`;
     /* ================================================ */
 
-	// Your web app's Firebase configuration
-	const firebaseConfig = {
-	  apiKey: "AIzaSyBpgbhTJkxi5j8HrwpUzFfZHAABcOfZnKs",
-	  authDomain: "exercise-tracker-d339a.firebaseapp.com",
-	  projectId: "exercise-tracker-d339a",
-	  storageBucket: "exercise-tracker-d339a.firebasestorage.app",
-	  messagingSenderId: "133943402653",
-	  appId: "1:133943402653:web:03328186b7addd755b3474",
-	  measurementId: "G-VSP6K6KQHG"
-	};
+    const firebaseConfig = {
+      apiKey: "AIzaSyBpgbhTJkxi5j8HrwpUzFfZHAABcOfZnKs",
+      authDomain: "exercise-tracker-d339a.firebaseapp.com",
+      projectId: "exercise-tracker-d339a",
+      storageBucket: "exercise-tracker-d339a.firebasestorage.app",
+      messagingSenderId: "133943402653",
+      appId: "1:133943402653:web:03328186b7addd755b3474",
+      measurementId: "G-VSP6K6KQHG"
+    };
 
     // ===== 初始化 =====
     const app = initializeApp(firebaseConfig);
@@ -244,7 +255,6 @@
       const pwdHash = await sha256(password);
 
       if (!snap.exists()){
-        // 註冊帳號
         await setDoc(acctRef, { passwordHash: pwdHash, createdAt: new Date().toISOString() });
       } else {
         if (snap.data().passwordHash !== pwdHash){
@@ -266,7 +276,6 @@
         });
       }
 
-      // 登入成功 → 記憶在 localStorage（含 round）
       localStorage.setItem('currentUser', username);
       localStorage.setItem('currentRoundId', ROUND_ID);
       currentUser = username;
@@ -287,7 +296,7 @@
       initDate();
     }
 
-    // ===== 監聽本輪 participants（排行榜 + 每日表）=====
+    // ===== 監聽 participants =====
     function startParticipantsListener(){
       if (unsubscribe) unsubscribe();
       const q = query(collection(db, `rounds/${ROUND_ID}/participants`));
@@ -322,21 +331,21 @@
         const completion = ((p.total/TOTAL_GOAL)*100).toFixed(1);
         const canEdit = (id === currentUser);
         const tr=document.createElement('tr');
-        tr.className='border-b border-gray-200 hover:bg-gray-100';
+        tr.className='border-b border-gray-200 hover:bg-gray-50';
         tr.innerHTML = `
-          <td class="py-3 px-6 text-left whitespace-nowrap">
+          <td class="py-3 px-4 md:px-6 text-left whitespace-nowrap">
             ${p.name}
-            ${canEdit ? `<button data-edit="${id}" class="text-blue-500 hover:text-blue-700 ml-2">[編輯]</button>` : ''}
+            ${canEdit ? `<button data-edit="${id}" class="text-blue-600 hover:text-blue-800 ml-2 text-xs">[編輯]</button>` : ''}
           </td>
-          <td class="py-3 px-6 text-left">${p.squat||0}</td>
-          <td class="py-3 px-6 text-left">${p.pushup||0}</td>
-          <td class="py-3 px-6 text-left">${p.rowing||0}</td>
-          <td class="py-3 px-6 text-left font-bold text-lg">${p.total||0}</td>
-          <td class="py-3 px-6 text-left">
+          <td class="py-3 px-4 md:px-6 text-left">${p.squat||0}</td>
+          <td class="py-3 px-4 md:px-6 text-left">${p.pushup||0}</td>
+          <td class="py-3 px-4 md:px-6 text-left">${p.rowing||0}</td>
+          <td class="py-3 px-4 md:px-6 text-left font-bold md:text-lg">${p.total||0}</td>
+          <td class="py-3 px-4 md:px-6 text-left">
             <div class="bg-gray-200 rounded-full h-2.5">
               <div class="bg-blue-500 h-2.5 rounded-full" style="width:${Math.min(completion,100)}%"></div>
             </div>
-            <span class="text-xs text-gray-500">${completion}%</span>
+            <span class="text-[11px] text-gray-500">${completion}%</span>
           </td>`;
         progressTableBody.appendChild(tr);
       });
@@ -345,7 +354,8 @@
       progressTableBody.querySelectorAll('button[data-edit]').forEach(btn=>{
         btn.addEventListener('click', ()=>{
           if (btn.dataset.edit !== currentUser) return;
-          nameInput.value = all[currentUser]?.name || currentUser;
+          const self = all[currentUser];
+          nameInput.value = self?.name || currentUser;
           nameModal.style.display='flex';
         });
       });
@@ -358,12 +368,12 @@
       const headerRow=document.createElement('tr');
       headerRow.className='daily-log-table';
       const nameHeader=document.createElement('th');
-      nameHeader.className='py-3 px-6 text-left';
+      nameHeader.className='py-3 px-4 md:px-6 text-left';
       nameHeader.textContent='參賽者';
       headerRow.appendChild(nameHeader);
       dates.forEach(d=>{
         const th=document.createElement('th');
-        th.className='py-3 px-2 text-center text-xs';
+        th.className='py-3 px-2 text-center text-[11px]';
         th.textContent=`${d.getMonth()+1}/${d.getDate()}`;
         headerRow.appendChild(th);
       });
@@ -372,9 +382,9 @@
       ids.forEach(id=>{
         const p = all[id];
         const tr=document.createElement('tr');
-        tr.className='border-b border-gray-200 hover:bg-gray-100';
+        tr.className='border-b border-gray-200 hover:bg-gray-50';
         const nameCell=document.createElement('td');
-        nameCell.className='py-3 px-6 text-left whitespace-nowrap';
+        nameCell.className='py-3 px-4 md:px-6 text-left whitespace-nowrap';
         nameCell.textContent=p.name;
         tr.appendChild(nameCell);
 
@@ -383,7 +393,7 @@
           const rec = (p.dailyLog||{})[key] || {squat:0,pushup:0,rowing:0};
           const sum = (rec.squat||0)+(rec.pushup||0)+(rec.rowing||0);
           const td=document.createElement('td');
-          td.className='py-3 px-2 text-center text-xs';
+          td.className='py-2.5 px-2 text-center text-xs';
           td.textContent = sum>0 ? sum : '-';
           tr.appendChild(td);
         });
@@ -408,7 +418,7 @@
       btnRowing.textContent = `划船 (${rec.rowing||0})`;
     }
 
-    // ===== 寫入自己紀錄（本輪）=====
+    // ===== 寫入自己紀錄 =====
     async function saveReps(kind, date, newVal){
       const ref = doc(db, `rounds/${ROUND_ID}/participants`, currentUser);
       const snap = await getDoc(ref);
@@ -418,7 +428,6 @@
       const old = ((daily[date]||{})[kind]) || 0;
       const diff = newVal - old;
 
-      // 更新彙總
       const accum = {
         squat: data.squat||0,
         pushup: data.pushup||0,
@@ -428,7 +437,6 @@
       accum[kind] += diff;
       accum.total += diff;
 
-      // 更新 daily
       if (!daily[date]) daily[date] = {squat:0,pushup:0,rowing:0};
       daily[date][kind] = newVal;
 
@@ -524,7 +532,6 @@
 
     // ===== 自動登入（綁定 round）=====
     (async function boot(){
-      // 若 localStorage 的 round 跟目前 ROUND_ID 不同，要求使用者重新登入（避免跨輪沿用舊身份誤寫到錯輪）
       const savedU = localStorage.getItem('currentUser');
       const savedR = localStorage.getItem('currentRoundId');
       initDate();
