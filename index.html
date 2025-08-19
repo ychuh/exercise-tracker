@@ -3,38 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>運動挑戰追蹤器</title>
+  <title>運動挑戰追蹤器（純卡片＋每日紀錄）</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Favicon & PWA -->
-	<!-- manifest & icons（和 index.html 同層時） -->
-	<link rel="manifest" href="./manifest.json">
-
-	<link rel="icon" type="image/png" sizes="192x192" href="./icon-192-v2.png">
-	<link rel="icon" type="image/png" sizes="512x512" href="./icon-512-v2.png">
-
-	<!-- iOS 專用 icon -->
-	<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-
-	<!-- PWA meta（兼容 iOS/Android） -->
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="default">
-	<meta name="theme-color" content="#2563eb">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192-v2.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512-v2.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+  <!-- PWA meta（兼容 iOS/Android） -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#2563eb">
 
   <style>
     body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans TC',sans-serif;background:#f3f4f6;color:#1f2937}
     .daily-log-table-container{overflow-x:auto}
     .daily-log-table th,.daily-log-table td{min-width:72px;text-align:center}
-    .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;
-           background:rgba(0,0,0,.4);justify-content:center;align-items:center}
-    .modal-content{background:#fff;margin:auto;padding:20px;border-radius:12px;width:92%;max-width:420px;
-                   box-shadow:0 8px 24px rgba(0,0,0,.15)}
+    .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.4);justify-content:center;align-items:center}
+    .modal-content{background:#fff;margin:auto;padding:20px;border-radius:12px;width:92%;max-width:420px;box-shadow:0 8px 24px rgba(0,0,0,.15)}
     @media (max-width: 767px){ .card { border-radius: 16px; } }
   </style>
 </head>
-<body class="p-4 md:p-10 min-h-screen flex items-start md:items-center justify-center"
-      style="padding-bottom: calc(env(safe-area-inset-bottom) + 96px);">
+<body class="p-4 md:p-10 min-h-screen flex items-start md:items-center justify-center" style="padding-bottom: calc(env(safe-area-inset-bottom) + 96px);">
 
   <!-- 登入頁 -->
   <div id="login-page" class="w-full max-w-md p-6 md:p-8 bg-white rounded-2xl shadow-xl card">
@@ -44,28 +36,21 @@
       <div>日期範圍：<span id="login-range-label"></span></div>
     </div>
     <div class="space-y-3">
-      <input id="username" placeholder="使用者名稱（英數._-）"
-             class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-      <input id="password" type="password" placeholder="密碼"
-             class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-      <button id="loginBtn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg active:scale-[.98]">
-        登入
-      </button>
+      <input id="username" placeholder="使用者名稱（英數._-）" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <input id="password" type="password" placeholder="密碼" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <button id="loginBtn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg active:scale-[.98]">登入</button>
       <p id="login-error" class="text-sm text-red-600 h-5"></p>
     </div>
     <p class="text-[11px] md:text-xs text-gray-500 mt-4 text-center">此登入為前端自管帳密，不使用 Firebase Authentication。</p>
   </div>
 
-  <!-- 主頁 -->
+  <!-- 主頁（純卡片＋每日紀錄） -->
   <div id="app-page" class="hidden bg-white p-4 md:p-8 rounded-2xl shadow-xl max-w-6xl w-full card">
     <!-- 頂部 -->
     <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-0 mb-4">
       <div class="space-y-1">
         <h1 class="text-2xl md:text-3xl font-bold text-blue-800">30天運動挑戰</h1>
-        <div class="text-sm text-gray-600">
-          目前輪次：<span id="round-label" class="font-semibold"></span>，
-          日期：<span id="range-label"></span>
-        </div>
+        <div class="text-sm text-gray-600">目前輪次：<span id="round-label" class="font-semibold"></span>，日期：<span id="range-label"></span></div>
       </div>
       <div class="flex items-center gap-3">
         <div class="text-right leading-tight">
@@ -82,50 +67,14 @@
       <div id="today-tip" class="text-sm text-gray-600"></div>
     </div>
 
-    <!-- 目標 -->
-    <p class="text-gray-600 text-center mb-4 md:mb-6">目標：30天內完成總計 <span class="font-semibold">2500</span> 下運動</p>
-
     <!-- 日期選擇 -->
-    <div class="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
+    <div class="flex items-center justify-center gap-3 md:gap-4 mb-6">
       <label for="date-select" class="text-base md:text-lg font-medium text-gray-700">選擇日期</label>
-      <input type="date" id="date-select"
-             class="p-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
-
-    <!-- 視圖切換 -->
-    <div class="flex items-center justify-center gap-2 mb-3">
-      <button id="view-card"  class="px-3 py-1.5 rounded-lg text-sm bg-gray-900 text-white md:bg-gray-200 md:text-gray-700">卡片</button>
-      <button id="view-table" class="px-3 py-1.5 rounded-lg text-sm bg-gray-200 text-gray-700">表格</button>
-    </div>
-
-    <!-- 三鍵（桌機） -->
-    <div class="hidden md:flex flex-wrap items-center justify-center gap-4 mb-6">
-      <button id="btn-squat"  class="bg-blue-600  hover:bg-blue-700  text-white font-semibold py-2 px-4 rounded-lg shadow-md transition hover:scale-105">深蹲</button>
-      <button id="btn-pushup" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition hover:scale-105">伏地挺身</button>
-      <button id="btn-rowing"  class="bg-red-600   hover:bg-red-700   text-white font-semibold py-2 px-4 rounded-lg shadow-md transition hover:scale-105">划船</button>
+      <input type="date" id="date-select" class="p-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
 
     <!-- 卡片視圖容器 -->
-    <div id="cards-wrap" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 hidden"></div>
-
-    <!-- 總進度（表格） -->
-    <div id="table-wrap">
-      <div class="overflow-x-auto mb-6 md:mb-8">
-        <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
-          <thead>
-            <tr class="bg-gray-100 text-left text-gray-600 uppercase text-[11px] md:text-sm leading-normal">
-              <th class="py-3 px-4 md:px-6">參賽者</th>
-              <th class="py-3 px-4 md:px-6">深蹲總計</th>
-              <th class="py-3 px-4 md:px-6">伏地挺身總計</th>
-              <th class="py-3 px-4 md:px-6">划船總計</th>
-              <th class="py-3 px-4 md:px-6">總計</th>
-              <th class="py-3 px-4 md:px-6">完成度</th>
-            </tr>
-          </thead>
-          <tbody id="progress-table-body" class="text-gray-700 text-sm font-light"></tbody>
-        </table>
-      </div>
-    </div>
+    <div id="cards-wrap" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"></div>
 
     <!-- 每日紀錄 -->
     <h2 class="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-gray-800 text-center">每日運動紀錄</h2>
@@ -136,57 +85,42 @@
       </table>
     </div>
 
-    <!-- 成就徽章（只顯示已解鎖且目前仍符合；同義合併；新→舊） -->
+    <!-- 成就徽章（已解鎖為主；未符合者灰顯） -->
     <h2 class="text-xl md:text-2xl font-bold mt-8 mb-3 text-gray-800 text-center">成就徽章</h2>
     <div id="badges-wrap" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
     <p class="text-xs text-gray-500 mt-1 text-center">解鎖新徽章時會自動顯示 🎉</p>
 
     <!-- Admin 工具（?admin=1 顯示） -->
     <div id="admin-tools" class="hidden mt-4 text-center">
-      <button id="btn-dedupe" class="px-3 py-1.5 text-xs rounded-md border border-gray-300 hover:bg-gray-100">
-        清理重複徽章＋修復為正確狀態（僅自己）
-      </button>
+      <button id="btn-dedupe" class="px-3 py-1.5 text-xs rounded-md border border-gray-300 hover:bg-gray-100">清理重複徽章＋修復為正確狀態（僅自己）</button>
     </div>
   </div>
 
-<!-- 手機底部快操作列（登入前隱藏） -->
-<nav id="quickbar" class="fixed md:hidden bottom-0 inset-x-0 z-[60] hidden select-none">
-  <div class="mx-auto max-w-6xl">
-    <div class="m-3 rounded-2xl bg-white/95 backdrop-blur border border-gray-300 p-2 shadow-xl">
-      <div class="grid grid-cols-3 gap-2">
-        <!-- 深蹲 -->
-        <button
-          class="h-14 rounded-full font-semibold bg-blue-600 text-white active:scale-95 shadow-md flex items-center justify-center gap-2"
-          onclick="document.getElementById('btn-squat').click()"
-          aria-label="新增深蹲">
-          <span class="text-lg">🏋️</span>
-          <span class="text-sm">深蹲</span>
-        </button>
-
-        <!-- 伏地挺身 -->
-        <button
-          class="h-14 rounded-full font-semibold bg-green-600 text-white active:scale-95 shadow-md flex items-center justify-center gap-2"
-          onclick="document.getElementById('btn-pushup').click()"
-          aria-label="新增伏地挺身">
-          <span class="text-lg">💪</span>
-          <span class="text-sm">伏地</span>
-        </button>
-
-        <!-- 划船 -->
-        <button
-          class="h-14 rounded-full font-semibold bg-red-600 text-white active:scale-95 shadow-md flex items-center justify-center gap-2"
-          onclick="document.getElementById('btn-rowing').click()"
-          aria-label="新增划船">
-          <span class="text-lg">🚣</span>
-          <span class="text-sm">划船</span>
-        </button>
+  <!-- 手機底部快操作列（登入前隱藏） -->
+  <nav id="quickbar" class="fixed md:hidden bottom-0 inset-x-0 z-[60] hidden select-none">
+    <div class="mx-auto max-w-6xl">
+      <div class="m-3 rounded-2xl bg-white/95 backdrop-blur border border-gray-300 p-2 shadow-xl">
+        <div class="grid grid-cols-3 gap-2">
+          <!-- 深蹲 -->
+          <button class="h-14 rounded-xl font-semibold bg-white border border-gray-300 text-gray-700 active:scale-95 shadow-sm flex items-center justify-center gap-2" onclick="document.getElementById('btn-squat').click()" aria-label="新增深蹲">
+            <svg class="w-5 h-5"><use href="#icon-walk"/></svg>
+            <span class="text-sm">深蹲</span>
+          </button>
+          <!-- 伏地挺身 -->
+          <button class="h-14 rounded-xl font-semibold bg-white border border-gray-300 text-gray-700 active:scale-95 shadow-sm flex items-center justify-center gap-2" onclick="document.getElementById('btn-pushup').click()" aria-label="新增伏地挺身">
+            <svg class="w-5 h-5"><use href="#icon-pushup"/></svg>
+            <span class="text-sm">伏地</span>
+          </button>
+          <!-- 划船 -->
+          <button class="h-14 rounded-xl font-semibold bg-white border border-gray-300 text-gray-700 active:scale-95 shadow-sm flex items-center justify-center gap-2" onclick="document.getElementById('btn-rowing').click()" aria-label="新增划船">
+            <svg class="w-5 h-5"><use href="#icon-row"/></svg>
+            <span class="text-sm">划船</span>
+          </button>
+        </div>
+        <div class="pt-1" style="padding-bottom: env(safe-area-inset-bottom);"></div>
       </div>
-
-      <!-- 安全區填充，避免 iOS 手勢區壓到按鈕 -->
-      <div class="pt-1" style="padding-bottom: env(safe-area-inset-bottom);"></div>
     </div>
-  </div>
-</nav>
+  </nav>
 
   <!-- 數量 Modal -->
   <div id="reps-modal" class="modal">
@@ -213,13 +147,27 @@
     </div>
   </div>
 
-  <!-- Firebase + App -->
+  <!-- SVG Sprite（SF Symbols 風格／灰白） -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="icon-walk" viewBox="0 0 24 24">
+      <path d="M12 3.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
+      <path d="M11 7.5l-2 4-2 2.5M11 7.5l3 2 2 4.5M7 14l-1 4M16 14l1.5 5" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-pushup" viewBox="0 0 24 24">
+      <path d="M3 17h18" stroke="#E5E7EB" stroke-width="2" stroke-linecap="round"/>
+      <path d="M6 16l5-3 3 .5 4 1.5" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="11" cy="10" r="1.6" fill="none" stroke="#9CA3AF" stroke-width="2"/>
+    </symbol>
+    <symbol id="icon-row" viewBox="0 0 24 24">
+      <path d="M4 15c2.5 2 13.5 2 16 0l-2 3H6l-2-3Z" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M10 9l6 6M17 7l2 2-3 3-2-2 3-3Z" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </svg>
+
+  <!-- Firebase + App（純卡片版） -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import {
-      getFirestore, doc, getDoc, setDoc, updateDoc,
-      collection, query, onSnapshot, getDocs, deleteDoc
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, onSnapshot, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     /* ======== <<< 換下一輪只需要改這裡 >>> ======== */
     const CHALLENGE_START = '2025-08-16';
@@ -245,8 +193,6 @@
     let currentUser = null;
     let unsubscribe = null;
     const TOTAL_GOAL = 2500;
-
-    // ★ 徽章頒發中的臨時鎖，避免並發重複
     const awardInflight = new Set();
     let badgesSyncedOnce = false;
 
@@ -271,7 +217,6 @@
     const logoutBtn = document.getElementById('logoutBtn');
 
     const dateSelect        = document.getElementById('date-select');
-    const progressTableBody = document.getElementById('progress-table-body');
     const dailyLogTableHead = document.getElementById('daily-log-table-head');
     const dailyLogTableBody = document.getElementById('daily-log-table-body');
 
@@ -287,200 +232,41 @@
     const nameModalConfirm = document.getElementById('name-modal-confirm');
     const nameModalCancel  = document.getElementById('name-modal-cancel');
 
-    const btnSquat  = document.getElementById('btn-squat');
-    const btnPushup = document.getElementById('btn-pushup');
-    const btnRowing = document.getElementById('btn-rowing');
-
-    // 視圖切換
-    let viewMode = 'card'; // 手機預設卡片、桌機在 showApp() 會改表格
-    const cardsWrap   = document.getElementById('cards-wrap');
-    const tableWrap   = document.getElementById('table-wrap');
-    const viewBtnCard = document.getElementById('view-card');
-    const viewBtnTable= document.getElementById('view-table');
+    // 手機快鍵（隱藏的觸發器）
+    const btnSquat  = document.createElement('button'); btnSquat.id='btn-squat'; btnSquat.className='hidden'; document.body.appendChild(btnSquat);
+    const btnPushup = document.createElement('button'); btnPushup.id='btn-pushup'; btnPushup.className='hidden'; document.body.appendChild(btnPushup);
+    const btnRowing = document.createElement('button'); btnRowing.id='btn-rowing'; btnRowing.className='hidden'; document.body.appendChild(btnRowing);
 
     // Admin 開關（?admin=1 顯示工具）
     const isAdmin = new URLSearchParams(location.search).get('admin') === '1';
     if (isAdmin) adminTools.classList.remove('hidden');
 
     // ===== 小工具 =====
-    async function sha256(str){
-      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-    }
-    function formatDate(date){
-      const y=date.getFullYear();
-      const m=String(date.getMonth()+1).padStart(2,'0');
-      const d=String(date.getDate()).padStart(2,'0');
-      return `${y}-${m}-${d}`;
-    }
-    function clampDateToRange(d){
-      const min=new Date(CHALLENGE_START), max=new Date(CHALLENGE_END);
-      if(d<min) return min; if(d>max) return max; return d;
-    }
-    function generateDateRange(){
-      const res=[], end=new Date(CHALLENGE_END);
-      let cur=new Date(CHALLENGE_START);
-      while(cur<=end){ res.push(new Date(cur)); cur.setDate(cur.getDate()+1); }
-      return res;
-    }
-    function initDate(){
-      dateSelect.min = CHALLENGE_START;
-      dateSelect.max = CHALLENGE_END;
-      const today = clampDateToRange(new Date());
-      dateSelect.value = formatDate(today);
-
-      loginRoundLabel.textContent = ROUND_ID;
-      loginRangeLabel.textContent = `${CHALLENGE_START} ～ ${CHALLENGE_END}`;
-      roundLabel.textContent = ROUND_ID;
-      rangeLabel.textContent = `${CHALLENGE_START} ～ ${CHALLENGE_END}`;
-      renderHints();
-    }
+    async function sha256(str){ const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+    function fmtDate(date){ const y=date.getFullYear(); const m=String(date.getMonth()+1).padStart(2,'0'); const d=String(date.getDate()).padStart(2,'0'); return `${y}-${m}-${d}`; }
+    function clampDateToRange(d){ const min=new Date(CHALLENGE_START), max=new Date(CHALLENGE_END); if(d<min) return min; if(d>max) return max; return d; }
+    function dateRange(){ const res=[], end=new Date(CHALLENGE_END); let cur=new Date(CHALLENGE_START); while(cur<=end){ res.push(new Date(cur)); cur.setDate(cur.getDate()+1);} return res; }
+    function initDate(){ dateSelect.min = CHALLENGE_START; dateSelect.max = CHALLENGE_END; const today = clampDateToRange(new Date()); dateSelect.value = fmtDate(today); loginRoundLabel.textContent = ROUND_ID; loginRangeLabel.textContent = `${CHALLENGE_START} ～ ${CHALLENGE_END}`; roundLabel.textContent = ROUND_ID; rangeLabel.textContent = `${CHALLENGE_START} ～ ${CHALLENGE_END}`; renderHints(); }
 
     // 倒數＋今日建議
-    function renderHints(){
-      const today = new Date(dateSelect.value);
-      const end   = new Date(CHALLENGE_END);
-      const leftDays = Math.max(0, Math.ceil((end - today)/86400000)+1);
-      document.getElementById('countdown').textContent = `本輪倒數：還有 ${leftDays} 天`;
-      document.getElementById('today-tip').textContent = `今日建議：至少 ${Math.ceil(TOTAL_GOAL/30)} 下`;
-    }
+    function renderHints(){ const today = new Date(dateSelect.value); const end   = new Date(CHALLENGE_END); const leftDays = Math.max(0, Math.ceil((end - today)/86400000)+1); document.getElementById('countdown').textContent = `本輪倒數：還有 ${leftDays} 天`; document.getElementById('today-tip').textContent = `今日建議：至少 ${Math.ceil(TOTAL_GOAL/30)} 下`; }
     dateSelect.addEventListener('change', renderHints);
 
     // 修仙境界（依總次數）
-    function realmFromTotal(total){
-      const t = Math.max(0, total || 0);
-      const steps = [
-        { id:'qi',        at:100,  name:'煉氣期', emoji:'🌱', color:'emerald' },
-        { id:'foundation',at:500,  name:'築基期', emoji:'🧱', color:'amber'   },
-        { id:'core',      at:1000, name:'金丹期', emoji:'🔮', color:'violet'  },
-        { id:'infant',    at:1500, name:'元嬰期', emoji:'👶', color:'sky'     },
-        { id:'spirit',    at:2000, name:'化神期', emoji:'🔥', color:'orange'  },
-        { id:'ascend',    at:2500, name:'飛升',   emoji:'🕊️', color:'amber'   },
-      ];
-      let current = { id:'mortal', at:0, name:'凡人', emoji:'🙂', color:'gray' };
-      let next = steps[0];
-      for (const s of steps){
-        if (t >= s.at) { current = s; next = null; } else { next = s; break; }
-      }
-      const pct    = Math.min(100, (t / 2500) * 100);
-      const remain = next ? Math.max(0, next.at - t) : 0;
-      return { current, next, pct, remain };
-    }
-    function calcStreak(daily, dateStr){
-      const dates = generateDateRange().map(d=>formatDate(d));
-      let i = dates.indexOf(dateStr);
-      let streak = 0;
-      for (; i >= 0; i--){
-        const r = daily?.[dates[i]];
-        const sum = (r?.squat||0) + (r?.pushup||0) + (r?.rowing||0);
-        if (sum > 0) streak++; else break;
-      }
-      return streak;
-    }
-    function sumFromDaily(daily){
-      let tot = 0;
-      for (const k in (daily||{})) {
-        const r = daily[k] || {};
-        tot += (r.squat||0)+(r.pushup||0)+(r.rowing||0);
-      }
-      return tot;
-    }
+    function realmFromTotal(total){ const t = Math.max(0, total || 0); const steps = [ { id:'qi',        at:100,  name:'煉氣期', emoji:'🌱', color:'emerald' }, { id:'foundation',at:500,  name:'築基期', emoji:'🧱', color:'amber'   }, { id:'core',      at:1000, name:'金丹期', emoji:'🔮', color:'violet'  }, { id:'infant',    at:1500, name:'元嬰期', emoji:'👶', color:'sky'     }, { id:'spirit',    at:2000, name:'化神期', emoji:'🔥', color:'orange'  }, { id:'ascend',    at:2500, name:'飛升',   emoji:'🕊️', color:'amber'   }, ]; let current = { id:'mortal', at:0, name:'凡人', emoji:'🙂', color:'gray' }; let next = steps[0]; for (const s of steps){ if (t >= s.at) { current = s; next = null; } else { next = s; break; } } const pct    = Math.min(100, (t / 2500) * 100); const remain = next ? Math.max(0, next.at - t) : 0; return { current, next, pct, remain }; }
+    function sumFromDaily(daily){ let tot = 0; for (const k in (daily||{})) { const r = daily[k] || {}; tot += (r.squat||0)+(r.pushup||0)+(r.rowing||0); } return tot; }
 
     // ===== 帳號登入（自管） =====
-    async function loginWithUsernamePassword(username, password){
-      loginErr.textContent='';
-      const acctRef = doc(db, 'accounts', username);
-      const snap = await getDoc(acctRef);
-      const pwdHash = await sha256(password);
+    async function login(username, password){ loginErr.textContent=''; const acctRef = doc(db, 'accounts', username); const snap = await getDoc(acctRef); const pwdHash = await sha256(password); if (!snap.exists()){ await setDoc(acctRef, { passwordHash: pwdHash, createdAt: new Date().toISOString() }); } else { if (snap.data().passwordHash !== pwdHash){ throw new Error('密碼錯誤'); } } const pRef = doc(db, `rounds/${ROUND_ID}/participants`, username); const pSnap = await getDoc(pRef); if (!pSnap.exists()){ await setDoc(pRef, { name: username, creatorId: username, squat: 0, pushup: 0, rowing: 0, total: 0, dailyLog: JSON.stringify({}), updatedAt: new Date().toISOString(), roundId: ROUND_ID }); }
+      localStorage.setItem('currentUser', username); localStorage.setItem('currentRoundId', ROUND_ID); currentUser = username; }
 
-      if (!snap.exists()){
-        await setDoc(acctRef, { passwordHash: pwdHash, createdAt: new Date().toISOString() });
-      } else {
-        if (snap.data().passwordHash !== pwdHash){
-          throw new Error('密碼錯誤');
-        }
-      }
-
-      // 確保本輪 participant 存在
-      const pRef = doc(db, `rounds/${ROUND_ID}/participants`, username);
-      const pSnap = await getDoc(pRef);
-      if (!pSnap.exists()){
-        await setDoc(pRef, {
-          name: username,
-          creatorId: username,
-          squat: 0, pushup: 0, rowing: 0, total: 0,
-          dailyLog: JSON.stringify({}),
-          updatedAt: new Date().toISOString(),
-          roundId: ROUND_ID
-        });
-      }
-
-      localStorage.setItem('currentUser', username);
-      localStorage.setItem('currentRoundId', ROUND_ID);
-      currentUser = username;
-    }
-
-    function setView(mode){
-      viewMode = mode;
-      if (mode === 'card') {
-        cardsWrap.classList.remove('hidden');
-        tableWrap.classList.add('hidden');
-        viewBtnCard.classList.add('bg-gray-900','text-white');
-        viewBtnTable.classList.remove('bg-gray-900','text-white');
-      } else {
-        tableWrap.classList.remove('hidden');
-        cardsWrap.classList.add('hidden');
-        viewBtnTable.classList.add('bg-gray-900','text-white');
-        viewBtnCard.classList.remove('bg-gray-900','text-white');
-      }
-    }
-    viewBtnCard?.addEventListener('click', ()=> setView('card'));
-    viewBtnTable?.addEventListener('click', ()=> setView('table'));
-
-    function showApp(){
-      loginPage.classList.add('hidden');
-      appPage.classList.remove('hidden');
-      quickbar?.classList.remove('hidden');   // 手機底部列顯示
-      userName.textContent = currentUser || '';
-      userIdEl.textContent = currentUser || '';
-      initDate();
-      setView(window.innerWidth < 768 ? 'card' : 'table'); // 手機卡片、桌機表格
-      startParticipantsListener();
-     // renderBadges(currentUser); // 首次渲染徽章（顯示）
-      // ★ 登入後做一次補發判斷（只跑一次）
-      if (!badgesSyncedOnce) { badgesSyncedOnce = true; checkAndAwardBadgesFor(currentUser); }
-    }
-    function showLogin(){
-      appPage.classList.add('hidden');
-      loginPage.classList.remove('hidden');
-      quickbar?.classList.add('hidden');      // 手機底部列隱藏
-      if (unsubscribe){ unsubscribe(); unsubscribe = null; }
-      initDate();
-    }
+    function showApp(){ loginPage.classList.add('hidden'); appPage.classList.remove('hidden'); quickbar?.classList.remove('hidden'); userName.textContent = currentUser || ''; userIdEl.textContent = currentUser || ''; initDate(); startParticipantsListener(); if (!badgesSyncedOnce) { badgesSyncedOnce = true; checkAndAward(currentUser); } }
+    function showLogin(){ appPage.classList.add('hidden'); loginPage.classList.remove('hidden'); quickbar?.classList.add('hidden'); if (unsubscribe){ unsubscribe(); unsubscribe = null; } initDate(); }
 
     // ===== 監聽 participants =====
-    function startParticipantsListener(){
-      if (unsubscribe) unsubscribe();
-      const q = query(collection(db, `rounds/${ROUND_ID}/participants`));
-      unsubscribe = onSnapshot(q, (snap)=>{
-        const all={};
-        snap.forEach(docSnap=>{
-          const d = docSnap.data();
-          if (d.dailyLog && typeof d.dailyLog === 'string'){
-            try{ d.dailyLog = JSON.parse(d.dailyLog); }catch{ d.dailyLog = {}; }
-          }
-          all[docSnap.id] = d;
-        });
-        renderTables(all);
-        renderCards(all); // 卡片視圖同步更新
-        // ★ 不在這裡頒發徽章，避免重複
-      }, (err)=>{
-        console.error('監聽失敗：', err);
-        alert(`Firestore 監聽失敗：${err.code || err.message}`);
-      });
-    }
+    function startParticipantsListener(){ if (unsubscribe) unsubscribe(); const q = query(collection(db, `rounds/${ROUND_ID}/participants`)); unsubscribe = onSnapshot(q, (snap)=>{ const all={}; snap.forEach(docSnap=>{ const d = docSnap.data(); if (d.dailyLog && typeof d.dailyLog === 'string'){ try{ d.dailyLog = JSON.parse(d.dailyLog); }catch{ d.dailyLog = {}; } } all[docSnap.id] = d; }); renderDailyLog(all); renderCards(all); renderBadges(currentUser); }, (err)=>{ console.error('監聽失敗：', err); alert(`Firestore 監聽失敗：${err.code || err.message}`); }); }
 
-    /* ===== 徽章定義（只看 totalFromDaily） ===== */
+    /* ===== 徽章定義 ===== */
     const BADGES = [
       { id:'realm_qi_100',        emoji:'🌱', title:'煉氣期', desc:'累積 100 下',        test:(s)=> s.totalFromDaily>=100 },
       { id:'realm_found_500',     emoji:'🧱', title:'築基期', desc:'累積 500 下',        test:(s)=> s.totalFromDaily>=500 },
@@ -488,141 +274,104 @@
       { id:'realm_infant_1500',   emoji:'👶', title:'元嬰期', desc:'累積 1,500 下',      test:(s)=> s.totalFromDaily>=1500 },
       { id:'realm_spirit_2000',   emoji:'🔥', title:'化神期', desc:'累積 2,000 下',      test:(s)=> s.totalFromDaily>=2000 },
       { id:'realm_ascend_2500',   emoji:'🕊️', title:'飛升',   desc:'累積 2,500 下（封頂）', test:(s)=> s.totalFromDaily>=2500 },
-
-      { id:'streak_3',   emoji:'🧘', title:'小閉關',       desc:'連續 3 日',   test:(s)=> s.streak>=3  },
-      { id:'streak_7',   emoji:'🧘', title:'七日坐忘',     desc:'連續 7 日',   test:(s)=> s.streak>=7  },
-      { id:'streak_14',  emoji:'🧘', title:'十四日入定',   desc:'連續 14 日',  test:(s)=> s.streak>=14 },
-      { id:'streak_21',  emoji:'🧘', title:'二十一日持修', desc:'連續 21 日',  test:(s)=> s.streak>=21 },
-      { id:'streak_30',  emoji:'🧘', title:'三十日圓滿',   desc:'連續 30 日',  test:(s)=> s.streak>=30 },
+      { id:'streak_3',  emoji:'🧘', title:'小閉關',       desc:'連續 3 日',   test:(s)=> s.streak>=3  },
+      { id:'streak_7',  emoji:'🧘', title:'七日坐忘',     desc:'連續 7 日',   test:(s)=> s.streak>=7  },
+      { id:'streak_14', emoji:'🧘', title:'十四日入定',   desc:'連續 14 日',  test:(s)=> s.streak>=14 },
+      { id:'streak_21', emoji:'🧘', title:'二十一日持修', desc:'連續 21 日',  test:(s)=> s.streak>=21 },
+      { id:'streak_30', emoji:'🧘', title:'三十日圓滿',   desc:'連續 30 日',  test:(s)=> s.streak>=30 },
     ];
-
-    // === 同義對照表（把舊ID/中文名映射到 canonical）===
-    const BADGE_CANON = {
-      realm_qi_100:      ['realm_qi_100','煉氣期','total_100','百煉成鋼'],
-      realm_found_500:   ['realm_found_500','築基期','total_500','五百破關'],
-      realm_core_1000:   ['realm_core_1000','金丹期','total_1000'],
-      realm_infant_1500: ['realm_infant_1500','元嬰期'],
-      realm_spirit_2000: ['realm_spirit_2000','化神期'],
-      realm_ascend_2500: ['realm_ascend_2500','total_2500','本輪完賽'],
-      streak_3:  ['streak_3','小閉關'],
-      streak_7:  ['streak_7','七日坐忘'],
-      streak_14: ['streak_14','十四日入定'],
-      streak_21: ['streak_21','二十一日持修'],
-      streak_30: ['streak_30','三十日圓滿'],
-      first_entry: ['first_entry','新手上路'],
-      day_goal:    ['day_goal','今日達標'],
-    };
-    const CANON_BY_ID_OR_TITLE = {};
-    for (const [canon, arr] of Object.entries(BADGE_CANON)) {
-      for (const key of arr) CANON_BY_ID_OR_TITLE[key] = canon;
-    }
     const BADGE_INDEX = BADGES.reduce((m,b)=> (m[b.id]=b, m), {});
 
-    // ===== 徽章上下文（用「今天」，不吃 UI 日期）=====
-    function calcContextFromParticipant(p){
-      const daily = p?.dailyLog || {};
-      const today = clampDateToRange(new Date());
-      const todayStr = formatDate(today);
+	// -------- 工具：清理 undefined --------
+	function sanitizeData(obj){
+	  const safe = {};
+	  for (const [k, v] of Object.entries(obj)) {
+		if (v === undefined) {
+		  safe[k] = 0;   // 預設轉成 0，你也可以改成 null
+		} else if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
+		  safe[k] = sanitizeData(v);  // 遞迴處理物件
+		} else {
+		  safe[k] = v;
+		}
+	  }
+	  return safe;
+	}
 
-      const recToday = daily[todayStr] || {squat:0,pushup:0,rowing:0};
-      const todaySum = (recToday.squat||0)+(recToday.pushup||0)+(recToday.rowing||0);
+	// -------- 工具：計算連續天數 --------
+	function calcStreak(dailyLog){
+	  if (!dailyLog) return 0;
 
-      // 由 daily 回推總數 —— 唯一真相
-      let totalFromDaily = 0;
-      for (const k in daily) {
-        const r = daily[k] || {};
-        totalFromDaily += (r.squat||0)+(r.pushup||0)+(r.rowing||0);
-      }
+	  const today = new Date();
+	  let d = new Date(today.toISOString().slice(0,10)); // 去掉時間部分
+	  let streak = 0;
 
-      // 連續天數（從今天往回）
-      const dates = generateDateRange().map(d=>formatDate(d));
-      let i = dates.indexOf(todayStr), streak = 0;
-      for (; i >= 0; i--){
-        const r = daily[dates[i]];
-        const s = (r?.squat||0)+(r?.pushup||0)+(r?.rowing||0);
-        if (s > 0) streak++; else break;
-      }
-      return { totalFromDaily, todaySum, streak, todayStr };
-    }
+	  while (true) {
+		const key = d.toISOString().slice(0,10);
+		const log = dailyLog[key];
 
-    async function getEarnedBadgeIds(userId){
-      const list = await getDocs(collection(db, `rounds/${ROUND_ID}/participants/${userId}/badges`));
-      return new Set(list.docs.map(d=>d.id));
-    }
+		if (log && (
+			(log.squat || 0) > 0 ||
+			(log.pushup || 0) > 0 ||
+			(log.rowing || 0) > 0
+		)) {
+		  streak++;
+		  d.setDate(d.getDate() - 1);
+		} else {
+		  break;
+		}
+	  }
+	  return streak;
+	}
+
+	// -------- 工具：算出 context --------
+	function ctxFromParticipant(p){
+	  const dailyLog = (p && typeof p.dailyLog === 'object') ? p.dailyLog : {};
+
+	  const totalSquat = Object.values(dailyLog).reduce((a,v)=>a+(v.squat||0),0);
+	  const totalPush  = Object.values(dailyLog).reduce((a,v)=>a+(v.pushup||0),0);
+	  const totalRow   = Object.values(dailyLog).reduce((a,v)=>a+(v.rowing||0),0);
+
+	  const totalFromDaily = (totalSquat + totalPush + totalRow) || 0;
+
+	  return {
+		totalFromDaily,
+		total: totalFromDaily,   // 🔑 兩個一起存，避免 undefined
+		squat: totalSquat || 0,
+		pushup: totalPush || 0,
+		rowing: totalRow || 0,
+		streak: calcStreak(dailyLog) || 0,
+		dailyLog
+	  };
+	}
+
+	// -------- 主函式：更新參加者 --------
+	async function updateParticipant(userId, p){
+	  const ctx = ctxFromParticipant(p);
+	  const ref = doc(db, `rounds/${ROUND_ID}/participants`, userId);
+	  const safeData = sanitizeData(ctx);
+	  await setDoc(ref, safeData, { merge: true });
+	}
+
+
+    async function earnedBadgeIds(userId){ const list = await getDocs(collection(db, `rounds/${ROUND_ID}/participants/${userId}/badges`)); return new Set(list.docs.map(d=>d.id)); }
     function _ts(x){ return x?.toMillis ? x.toMillis() : Date.parse(x || 0) || 0; }
-    async function getEarnedBadgeList(userId){
-      const qs = await getDocs(collection(db, `rounds/${ROUND_ID}/participants/${userId}/badges`));
-      const bucket = new Map(); // canon -> {id, data, t}
-      qs.forEach(docSnap=>{
-        const data = docSnap.data() || {};
-        const rawId   = docSnap.id;
-        const rawMeta = data.id || data.title || rawId;
-        const canon   = CANON_BY_ID_OR_TITLE[rawId]
-                     || CANON_BY_ID_OR_TITLE[rawMeta]
-                     || CANON_BY_ID_OR_TITLE[data.title]
-                     || rawId;
-        const t = _ts(data.earnedAt);
-        const cur = bucket.get(canon);
-        if (!cur || t > cur.t) bucket.set(canon, { id: canon, data, t });
-      });
-      return Array.from(bucket.values())
-                  .sort((a,b)=> b.t - a.t)
-                  .map(v=> ({ id: v.id, ...v.data }));
-    }
+    async function earnedBadgeList(userId){ const qs = await getDocs(collection(db, `rounds/${ROUND_ID}/participants/${userId}/badges`)); const arr=[]; qs.forEach(docSnap=>{ arr.push({ id: docSnap.id, ...(docSnap.data()||{}) }); }); return arr.sort((a,b)=> _ts(b.earnedAt)-_ts(a.earnedAt)); }
 
-    async function awardBadge(userId, badge){
-      await setDoc(doc(db, `rounds/${ROUND_ID}/participants/${userId}/badges`, badge.id), {
-        id: badge.id, title: badge.title, desc: badge.desc, earnedAt: new Date().toISOString()
-      }, { merge: true });
-    }
+    async function awardBadge(userId, badge){ await setDoc(doc(db, `rounds/${ROUND_ID}/participants/${userId}/badges`, badge.id), { id: badge.id, title: badge.title, desc: badge.desc, earnedAt: new Date().toISOString() }, { merge: true }); }
 
-    // ★ 只在「登入一次」與「寫入後」呼叫；先校正 total，再重算 ctx
-    async function checkAndAwardBadgesFor(userId){
-      if (!userId) return;
-
-      const ref = doc(db, `rounds/${ROUND_ID}/participants`, userId);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) return;
-
-      const p = snap.data();
-      if (p.dailyLog && typeof p.dailyLog === 'string'){
-        try{ p.dailyLog = JSON.parse(p.dailyLog); }catch{ p.dailyLog = {}; }
-      }
-
-      // 先算一次
-      let ctx = calcContextFromParticipant(p);
-
-      // 若 legacy 的 total 與 daily 合計不一致→以 daily 為準回填
-      if ((p.total||0) !== ctx.totalFromDaily){
-        await setDoc(ref, { total: ctx.totalFromDaily, updatedAt: new Date().toISOString() }, { merge:true });
-        // ★ 立即重算，避免用到舊的 total
-        ctx = calcContextFromParticipant({ ...p, total: ctx.totalFromDaily });
-      }
-
-      const owned = await getEarnedBadgeIds(userId);
-      const toAward = BADGES
-        .filter(b => !owned.has(b.id) && b.test(ctx))
-        .filter(b => !awardInflight.has(b.id));
-
+    // ★ 單一入口：登入後一次、寫入後一次
+    async function checkAndAward(userId){ if (!userId) return; const ref = doc(db, `rounds/${ROUND_ID}/participants`, userId); const snap = await getDoc(ref); if (!snap.exists()) return; const p = snap.data(); if (p.dailyLog && typeof p.dailyLog === 'string'){ try{ p.dailyLog = JSON.parse(p.dailyLog); }catch{ p.dailyLog = {}; } }
+      let ctx = ctxFromParticipant(p);
+      if ((p.total||0) !== ctx.totalFromDaily){ await setDoc(ref, { total: ctx.totalFromDaily, updatedAt: new Date().toISOString() }, { merge:true }); ctx = ctxFromParticipant({ ...p, total: ctx.totalFromDaily }); }
+      const owned = await earnedBadgeIds(userId);
+      const toAward = BADGES.filter(b => !owned.has(b.id) && b.test(ctx)).filter(b => !awardInflight.has(b.id));
       if (!toAward.length) return;
-
-      for (const b of toAward){
-        awardInflight.add(b.id);
-        try { await awardBadge(userId, b); }
-        finally { awardInflight.delete(b.id); }
-      }
-
+      for (const b of toAward){ awardInflight.add(b.id); try { await awardBadge(userId, b); } finally { awardInflight.delete(b.id); } }
       toast(`解鎖徽章：${toAward.map(b=>`${b.emoji} ${b.title}`).join('、')}`);
       renderBadges(userId);
     }
 
-    function toast(msg){
-      const el = document.createElement('div');
-      el.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 bg-black text-white text-sm px-4 py-2 rounded-lg shadow-lg z-[9999]';
-      el.textContent = msg;
-      document.body.appendChild(el);
-      setTimeout(()=>{ el.remove(); }, 2500);
-    }
+    function toast(msg){ const el = document.createElement('div'); el.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 bg-black text-white text-sm px-4 py-2 rounded-lg shadow-lg z-[9999]'; el.textContent = msg; document.body.appendChild(el); setTimeout(()=>{ el.remove(); }, 2500); }
 
     // 成就區：只顯示「已解鎖」且「目前仍符合條件」的徽章（同義合併，新→舊）
     async function renderBadges(userId){
@@ -636,11 +385,11 @@
       if (p.dailyLog && typeof p.dailyLog === 'string'){
         try{ p.dailyLog = JSON.parse(p.dailyLog); }catch{ p.dailyLog = {}; }
       }
-      const ctx = calcContextFromParticipant(p);
+	  const ctx = ctxFromParticipant(p);
       const eligible = new Set(BADGES.filter(b => b.test(ctx)).map(b => b.id));
 
       // 已解鎖（做同義合併與去重）
-      const earned = await getEarnedBadgeList(userId);
+      const earned = await earnedBadgeList(userId);
 
       // 僅顯示「已解鎖且目前仍符合」的徽章
       const show = earned.filter(it => eligible.has(it.id));
@@ -665,240 +414,25 @@
       }
     }
 
-    // === 去重＆修復：把重複徽章整併為 canonical，並刪掉不再符合條件的徽章 ===
-    function toCanonFromDoc(docSnap){
-      const data = docSnap.data() || {};
-      const rawId = docSnap.id;
-      const rawMeta = data.id || data.title || rawId;
-      const canon = CANON_BY_ID_OR_TITLE[rawId]
-                 || CANON_BY_ID_OR_TITLE[rawMeta]
-                 || CANON_BY_ID_OR_TITLE[data.title]
-                 || rawId;
-      return { canon, data };
-    }
-    async function dedupeBadgesFor(userId){
-      const col = collection(db, `rounds/${ROUND_ID}/participants/${userId}/badges`);
-      const qs  = await getDocs(col);
+    // ===== 每日紀錄（僅每日表） =====
+    function renderDailyLog(all){ dailyLogTableHead.innerHTML=''; dailyLogTableBody.innerHTML=''; const dates = dateRange(); const headerRow=document.createElement('tr'); headerRow.className='daily-log-table'; const nameHeader=document.createElement('th'); nameHeader.className='py-3 px-4 md:px-6 text-left'; nameHeader.textContent='參賽者'; headerRow.appendChild(nameHeader); dates.forEach(d=>{ const th=document.createElement('th'); th.className='py-3 px-2 text-center text-[11px]'; th.textContent=`${d.getMonth()+1}/${d.getDate()}`; headerRow.appendChild(th); }); dailyLogTableHead.appendChild(headerRow);
+      const ids = Object.keys(all).sort((a,b)=>{ const ta=(all[a].name||a), tb=(all[b].name||b); return ta.localeCompare(tb,'zh-Hant'); });
+      ids.forEach(id=>{ const p = all[id]; const tr=document.createElement('tr'); tr.className='border-b border-gray-200 hover:bg-gray-50'; const nameCell=document.createElement('td'); nameCell.className='py-3 px-4 md:px-6 text-left whitespace-nowrap'; nameCell.textContent=p.name; tr.appendChild(nameCell); dates.forEach(d=>{ const key=fmtDate(d); const rec = (p.dailyLog||{})[key] || {squat:0,pushup:0,rowing:0}; const sum = (rec.squat||0)+(rec.pushup||0)+(rec.rowing||0); const td=document.createElement('td'); td.className='py-2.5 px-2 text-center text-xs'; td.textContent = sum>0 ? sum : '-'; tr.appendChild(td); }); dailyLogTableBody.appendChild(tr); }); }
 
-      const keep = new Map(); // canon -> {id, t}
-      qs.forEach(docSnap=>{
-        const { canon, data } = toCanonFromDoc(docSnap);
-        const t = _ts(data.earnedAt);
-        const cur = keep.get(canon);
-        if (!cur || t > cur.t) keep.set(canon, { id: docSnap.id, t });
-      });
-
-      for (const docSnap of qs.docs){
-        const { canon, data } = toCanonFromDoc(docSnap);
-        const keepRec = keep.get(canon);
-
-        if (docSnap.id !== keepRec.id){
-          await deleteDoc(docSnap.ref);
-          continue;
-        }
-        if (docSnap.id !== canon){
-          await setDoc(doc(db, `rounds/${ROUND_ID}/participants/${userId}/badges`, canon),
-                       { ...data, id: canon }, { merge:true });
-          await deleteDoc(docSnap.ref);
-        }
-      }
-    }
-    async function repairBadges(userId){
-      const partRef = doc(db, `rounds/${ROUND_ID}/participants`, userId);
-      const snap = await getDoc(partRef);
-      if (!snap.exists()) return;
-
-      let p = snap.data();
-      if (p.dailyLog && typeof p.dailyLog === 'string'){
-        try{ p.dailyLog = JSON.parse(p.dailyLog); }catch{ p.dailyLog = {}; }
-      }
-      const ctx = calcContextFromParticipant(p);
-      const eligible = new Set(BADGES.filter(b => b.test(ctx)).map(b => b.id));
-
-      const col = collection(db, `rounds/${ROUND_ID}/participants/${userId}/badges`);
-      const qs  = await getDocs(col);
-
-      for (const docSnap of qs.docs){
-        const data = docSnap.data() || {};
-        const rawId = docSnap.id;
-        const canon = CANON_BY_ID_OR_TITLE[rawId] || CANON_BY_ID_OR_TITLE[data.id] || CANON_BY_ID_OR_TITLE[data.title] || rawId;
-        if (!eligible.has(canon)){
-          await deleteDoc(docSnap.ref);
-        }
-      }
-
-      await checkAndAwardBadgesFor(userId); // 依正確條件補發
-      await renderBadges(userId);
-      toast('徽章已修復為與實際紀錄一致');
-    }
-
-    // Admin 按鈕事件：去重 + 修復
-    document.getElementById('btn-dedupe')?.addEventListener('click', async ()=>{
-      await dedupeBadgesFor(currentUser);
-      await repairBadges(currentUser);
-    });
-
-    // ===== 表格渲染 =====
-    function renderTables(all){
-      // 排序
-      progressTableBody.innerHTML='';
-      const ids = Object.keys(all).sort((a,b)=>{
-        const ta=(all[a].total||0), tb=(all[b].total||0);
-        if (tb!==ta) return tb-ta;
-        return (all[a].name||a).localeCompare(all[b].name||b,'zh-Hant');
-      });
-
-      // 總進度
-      ids.forEach(id=>{
-        const p = all[id];
-        const completion = ((p.total/TOTAL_GOAL)*100).toFixed(1);
-        const canEdit = (id === currentUser);
-        const tr=document.createElement('tr');
-        tr.className='border-b border-gray-200 hover:bg-gray-50';
-        tr.innerHTML = `
-          <td class="py-3 px-4 md:px-6 text-left whitespace-nowrap">
-            ${p.name}
-            ${canEdit ? `<button data-edit="${id}" class="text-blue-600 hover:text-blue-800 ml-2 text-xs">[編輯]</button>` : ''}
-          </td>
-          <td class="py-3 px-4 md:px-6 text-left">${p.squat||0}</td>
-          <td class="py-3 px-4 md:px-6 text-left">${p.pushup||0}</td>
-          <td class="py-3 px-4 md:px-6 text-left">${p.rowing||0}</td>
-          <td class="py-3 px-4 md:px-6 text-left font-bold md:text-lg">${p.total||0}</td>
-          <td class="py-3 px-4 md:px-6 text-left">
-            <div class="bg-gray-200 rounded-full h-2.5">
-              <div class="bg-blue-500 h-2.5 rounded-full" style="width:${Math.min(completion,100)}%"></div>
-            </div>
-            <span class="text-[11px] text-gray-500">${completion}%</span>
-          </td>`;
-        progressTableBody.appendChild(tr);
-      });
-
-      // 綁定改名
-      progressTableBody.querySelectorAll('button[data-edit]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          if (btn.dataset.edit !== currentUser) return;
-          const self = all[currentUser];
-          nameInput.value = self?.name || currentUser;
-          nameModal.style.display='flex';
-        });
-      });
-
-      // 每日
-      dailyLogTableHead.innerHTML='';
-      dailyLogTableBody.innerHTML='';
-      const dates = generateDateRange();
-
-      const headerRow=document.createElement('tr');
-      headerRow.className='daily-log-table';
-      const nameHeader=document.createElement('th');
-      nameHeader.className='py-3 px-4 md:px-6 text-left';
-      nameHeader.textContent='參賽者';
-      headerRow.appendChild(nameHeader);
-      dates.forEach(d=>{
-        const th=document.createElement('th');
-        th.className='py-3 px-2 text-center text-[11px]';
-        th.textContent=`${d.getMonth()+1}/${d.getDate()}`;
-        headerRow.appendChild(th);
-      });
-      dailyLogTableHead.appendChild(headerRow);
-
-      const ids2 = Object.keys(all).sort((a,b)=>{
-        const ta=(all[a].name||a), tb=(all[b].name||b);
-        return ta.localeCompare(tb,'zh-Hant');
-      });
-
-      ids2.forEach(id=>{
-        const p = all[id];
-        const tr=document.createElement('tr');
-        tr.className='border-b border-gray-200 hover:bg-gray-50';
-        const nameCell=document.createElement('td');
-        nameCell.className='py-3 px-4 md:px-6 text-left whitespace-nowrap';
-        nameCell.textContent=p.name;
-        tr.appendChild(nameCell);
-
-        dates.forEach(d=>{
-          const key=formatDate(d);
-          const rec = (p.dailyLog||{})[key] || {squat:0,pushup:0,rowing:0};
-          const sum = (rec.squat||0)+(rec.pushup||0)+(rec.rowing||0);
-          const td=document.createElement('td');
-          td.className='py-2.5 px-2 text-center text-xs';
-          td.textContent = sum>0 ? sum : '-';
-          tr.appendChild(td);
-        });
-        dailyLogTableBody.appendChild(tr);
-      });
-
-      // 更新三鍵顯示（僅自己）
-      updateExerciseButtons(all[currentUser]);
-
-      // 不在這裡頒發徽章（避免重複）；但重新渲染 OK
-      renderBadges(currentUser);
-    }
-
-    // ===== 卡片視圖渲染（最高境界 + 最高連續）=====
-    function renderCards(all){
-      if (!cardsWrap) return;
-      cardsWrap.innerHTML = '';
-
-      const ids = Object.keys(all).sort((a,b)=>{
-        const ta=(all[a].total||0), tb=(all[b].total||0);
-        if (tb!==ta) return tb-ta;
-        return (all[a].name||a).localeCompare(all[b].name||b,'zh-Hant');
-      });
-
+    // ===== 卡片視圖（四分區：Header / 三欄動作 / 進度 / 徽章提示） =====
+    function renderCards(all){ const cardsWrap = document.getElementById('cards-wrap'); if (!cardsWrap) return; cardsWrap.innerHTML = '';
+      const ids = Object.keys(all).sort((a,b)=>{ const ta=(all[a].total||0), tb=(all[b].total||0); if (tb!==ta) return tb-ta; return (all[a].name||a).localeCompare(all[b].name||b,'zh-Hant'); });
       const todayStr = dateSelect.value;
+      ids.forEach((id, idx)=>{ const p = all[id]; const daily = p.dailyLog || {}; const today = daily[todayStr] || {squat:0,pushup:0,rowing:0}; const total = Number.isFinite(p.total) && p.total >= 0 ? p.total : sumFromDaily(daily); const streak = calcStreak(daily, todayStr); const realm  = realmFromTotal(total);
+        const theme = { emerald:{ chip:'bg-emerald-50 text-emerald-700 border border-emerald-200', bar:'bg-emerald-500', ring:'ring-emerald-200' }, amber:{ chip:'bg-amber-50 text-amber-700 border border-amber-200', bar:'bg-amber-500', ring:'ring-amber-200' }, violet:{ chip:'bg-violet-50 text-violet-700 border border-violet-200', bar:'bg-violet-500', ring:'ring-violet-200' }, sky:{ chip:'bg-sky-50 text-sky-700 border border-sky-200', bar:'bg-sky-500', ring:'ring-sky-200' }, orange:{ chip:'bg-orange-50 text-orange-700 border border-orange-200', bar:'bg-orange-500', ring:'ring-orange-200' }, gray:{ chip:'bg-gray-100 text-gray-700 border border-gray-200', bar:'bg-gray-500', ring:'ring-gray-200' } }[realm.current.color] || { chip:'bg-gray-100 text-gray-700 border border-gray-200', bar:'bg-gray-500', ring:'ring-gray-200' };
 
-      ids.forEach((id, idx)=>{
-        const p = all[id];
-        const daily = p.dailyLog || {};
-        const today = daily[todayStr] || {squat:0,pushup:0,rowing:0};
-        const todaySum = (today.squat||0)+(today.pushup||0)+(today.rowing||0);
-
-        const total = (Number.isFinite(p.total) && p.total >= 0) ? p.total : sumFromDaily(daily);
-        const streak = calcStreak(daily, todayStr);
-        const realm  = realmFromTotal(total);
-
-        const theme = {
-          emerald:{ chip:'bg-emerald-50 text-emerald-700 border border-emerald-200', bar:'bg-emerald-500', ring:'ring-emerald-200' },
-          amber:  { chip:'bg-amber-50 text-amber-700 border border-amber-200',       bar:'bg-amber-500',   ring:'ring-amber-200'   },
-          violet: { chip:'bg-violet-50 text-violet-700 border border-violet-200',    bar:'bg-violet-500',  ring:'ring-violet-200'  },
-          sky:    { chip:'bg-sky-50 text-sky-700 border border-sky-200',             bar:'bg-sky-500',     ring:'ring-sky-200'     },
-          orange: { chip:'bg-orange-50 text-orange-700 border border-orange-200',    bar:'bg-orange-500',  ring:'ring-orange-200'  },
-          gray:   { chip:'bg-gray-100 text-gray-700 border border-gray-200',         bar:'bg-gray-500',    ring:'ring-gray-200'    }
-        }[realm.current.color] || { chip:'bg-gray-100 text-gray-700 border border-gray-200', bar:'bg-gray-500', ring:'ring-gray-200' };
-
-        // —— 只取「最高」境界徽章
-        const realmSteps = [
-          {at:100,  txt:'🌱 煉氣'},
-          {at:500,  txt:'🧱 築基'},
-          {at:1000, txt:'🔮 金丹'},
-          {at:1500, txt:'👶 元嬰'},
-          {at:2000, txt:'🔥 化神'},
-          {at:2500, txt:'🕊️ 飛升'},
-        ];
-        let realmTop = null;
-        for (const s of realmSteps) { if (total >= s.at) realmTop = s; else break; }
-        const realmBadge = realmTop ? [realmTop.txt] : [];
-
-        // —— 只取「最高」連續天數獎勵
-        const streakSteps = [
-          {d:30, txt:'🧘 30日'},
-          {d:21, txt:'🧘 21日'},
-          {d:14, txt:'🧘 14日'},
-          {d:7,  txt:'🧘 7日'},
-          {d:3,  txt:'🧘 3日'},
-        ];
-        const streakTop  = streakSteps.find(s => streak >= s.d);
-        const streakBadge = streakTop ? [streakTop.txt] : [];
-
-        const badges = [...realmBadge, ...streakBadge];
-
+        // 四分區卡片樣式
         const card = document.createElement('article');
         card.className = `relative rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200 ${theme.ring}`;
-
         card.innerHTML = `
+          <!-- 區塊1：Header -->
           <div class="absolute -top-2 -right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded-full">#${idx+1}</div>
-          <header class="flex items-center gap-3">
+          <header class="flex items-center gap-3 mb-2">
             <div class="h-10 w-10 rounded-xl bg-gray-100 grid place-items-center text-gray-700 font-bold">${(p.name||id).slice(0,1).toUpperCase()}</div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2">
@@ -907,11 +441,30 @@
                   ${realm.current.emoji} ${realm.current.name}
                 </span>
               </div>
-              <p class="text-xs text-gray-500">總計 ${total} 下 · 今日 ${todaySum} · 連續 ${streak} 天</p>
+              <p class="text-xs text-gray-500">連續 ${streak} 天</p>
             </div>
           </header>
 
-          <div class="mt-3">
+          <!-- 區塊2：三欄動作（數字大在上、文字小在下） -->
+          <section class="">
+            <div class="flex justify-around text-center">
+              ${[ 
+                {k:'squat',  label:'深蹲',  icon:'walk',   v: today.squat||0},
+                {k:'pushup', label:'伏地',  icon:'pushup', v: today.pushup||0},
+                {k:'rowing', label:'划船',  icon:'row',    v: today.rowing||0},
+              ].map(a => `
+                <div class="px-1 py-1 text-center">
+                  <div class="text-lg font-bold leading-none">${a.v}</div>
+                  <div class="mt-1 text-[11px] text-gray-600 inline-flex items-center gap-1 justify-center">
+                    <svg class="w-3.5 h-3.5"><use href="#icon-${a.icon}"/></svg>${a.label}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </section>
+
+          <!-- 區塊3：進度條 -->
+          <section class="mt-2">
             <div class="flex justify-between text-xs text-gray-500 mb-1">
               <span>修為 ${total} / 2,500</span>
               <span>${realm.next ? `距「${realm.next.name}」還差 ${realm.remain}` : '已封頂'}</span>
@@ -919,167 +472,53 @@
             <div class="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
               <div class="h-full ${theme.bar}" style="width:${realm.pct.toFixed(2)}%"></div>
             </div>
-          </div>
+          </section>
 
-          <div class="mt-3 flex items-center gap-2 flex-wrap">
-            ${badges.map(txt => `
-              <span class="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${theme.chip} shadow-sm">${txt}</span>
-            `).join('')}
-          </div>
-
+          <!-- 區塊4：徽章提示（最高境界＋最高連續）
+          <section class="pt-3">
+            <div class="flex items-center gap-2 flex-wrap">
+              ${(() => {
+                const realmSteps = [
+                  {at:2500, txt:'🕊️ 飛升'},
+                  {at:2000, txt:'🔥 化神'},
+                  {at:1500, txt:'👶 元嬰'},
+                  {at:1000, txt:'🔮 金丹'},
+                  {at:500,  txt:'🧱 築基'},
+                  {at:100,  txt:'🌱 煉氣'},
+                ];
+                let realmTop = null; for (const s of realmSteps) { if (total >= s.at) { realmTop = s; break; } }
+                const streakSteps = [ {d:30, txt:'🧘 30日'}, {d:21, txt:'🧘 21日'}, {d:14, txt:'🧘 14日'}, {d:7, txt:'🧘 7日'}, {d:3, txt:'🧘 3日'} ];
+                const streakTop  = streakSteps.find(s => streak >= s.d);
+                const badges = [realmTop?.txt, streakTop?.txt].filter(Boolean);
+                return badges.map(txt => `<span class="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${theme.chip} shadow-sm">${txt}</span>`).join('') || `<span class="text-xs text-gray-500">尚無徽章，今天動一下吧 💪</span>`;
+              })()}
+            </div>
+          </section>  -->
         `;
-
-        const actBtn = card.querySelector('button[data-record]');
-        if (actBtn) {
-          if (id === currentUser) {
-            actBtn.addEventListener('click', ()=> document.getElementById('btn-squat').click());
-          } else {
-            actBtn.disabled = true;
-            actBtn.classList.add('opacity-50','cursor-not-allowed');
-          }
-        }
         cardsWrap.appendChild(card);
       });
     }
 
-    function updateExerciseButtons(self){
-      const date=dateSelect.value;
-      if(!self || !date){
-        btnSquat.textContent='深蹲';
-        btnPushup.textContent='伏地挺身';
-        btnRowing.textContent='划船';
-        return;
-      }
-      const rec = (self.dailyLog||{})[date] || {squat:0,pushup:0,rowing:0};
-      btnSquat.textContent = `深蹲 (${rec.squat||0})`;
-      btnPushup.textContent = `伏地挺身 (${rec.pushup||0})`;
-      btnRowing.textContent = `划船 (${rec.rowing||0})`;
-    }
+    // ===== 寫入自己紀錄（覆寫模式；寫入後頒發檢查） =====
+    async function saveReps(kind, date, newVal){ const ref = doc(db, `rounds/${ROUND_ID}/participants`, currentUser); const snap = await getDoc(ref); if (!snap.exists()) return; const data = snap.data(); const daily = typeof data.dailyLog === 'string' ? JSON.parse(data.dailyLog) : (data.dailyLog||{}); const old = ((daily[date]||{})[kind]) || 0; const diff = newVal - old; const accum = { squat: data.squat||0, pushup: data.pushup||0, rowing: data.rowing||0, total:  data.total ||0 }; accum[kind] += diff; accum.total += diff; if (!daily[date]) daily[date] = {squat:0,pushup:0,rowing:0}; daily[date][kind] = newVal; await setDoc(ref, { ...accum, dailyLog: JSON.stringify(daily), updatedAt: new Date().toISOString() }, { merge:true }); await checkAndAward(currentUser); }
 
-    // ===== 寫入自己紀錄 =====
-    async function saveReps(kind, date, newVal){
-      const ref = doc(db, `rounds/${ROUND_ID}/participants`, currentUser);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) return;
-      const data = snap.data();
-      const daily = typeof data.dailyLog === 'string' ? JSON.parse(data.dailyLog) : (data.dailyLog||{});
-      const old = ((daily[date]||{})[kind]) || 0;
-      const diff = newVal - old;
-
-      const accum = {
-        squat: data.squat||0,
-        pushup: data.pushup||0,
-        rowing: data.rowing||0,
-        total:  data.total ||0
-      };
-      accum[kind] += diff;
-      accum.total += diff;
-
-      if (!daily[date]) daily[date] = {squat:0,pushup:0,rowing:0};
-      daily[date][kind] = newVal;
-
-      await setDoc(ref, {
-        ...accum,
-        dailyLog: JSON.stringify(daily),
-        updatedAt: new Date().toISOString()
-      }, { merge:true });
-
-      // ★ 寫入後做一次頒發判斷（單一入口）
-      await checkAndAwardBadgesFor(currentUser);
-    }
-
-    async function saveOwnName(newName){
-      await updateDoc(doc(db, `rounds/${ROUND_ID}/participants`, currentUser), {
-        name: newName,
-        updatedAt: new Date().toISOString()
-      });
-      userName.textContent = newName;
-    }
+    async function saveOwnName(newName){ await updateDoc(doc(db, `rounds/${ROUND_ID}/participants`, currentUser), { name: newName, updatedAt: new Date().toISOString() }); userName.textContent = newName; }
 
     // ===== 事件 =====
-    loginBtn.addEventListener('click', async ()=>{
-      const u = usernameI.value.trim();
-      const p = passwordI.value;
-      if (!u || !p){ loginErr.textContent='請輸入使用者名稱與密碼'; return; }
-      if (!/^[A-Za-z0-9_.-]{3,32}$/.test(u)){ loginErr.textContent='使用者名稱僅限英數/._- (3-32字)'; return; }
-      try{
-        await loginWithUsernamePassword(u, p);
-        showApp();
-      }catch(e){
-        loginErr.textContent = e.message || '登入失敗';
-      }
-    });
+    loginBtn.addEventListener('click', async ()=>{ const u = usernameI.value.trim(); const p = passwordI.value; if (!u || !p){ loginErr.textContent='請輸入使用者名稱與密碼'; return; } if (!/^[A-Za-z0-9_.-]{3,32}$/.test(u)){ loginErr.textContent='使用者名稱僅限英數/._- (3-32字)'; return; } try{ await login(u, p); showApp(); }catch(e){ loginErr.textContent = e.message || '登入失敗'; } });
+    logoutBtn.addEventListener('click', ()=>{ localStorage.removeItem('currentUser'); localStorage.removeItem('currentRoundId'); currentUser = null; showLogin(); });
 
-    logoutBtn.addEventListener('click', ()=>{
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('currentRoundId');
-      currentUser = null;
-      showLogin();
-    });
+    btnSquat.addEventListener('click', async ()=>{ const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser)); const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{}; return (dl[dateSelect.value]?.squat)||0; })(); const v = await showRepsModal('深蹲', cur); if (v===null) return; await saveReps('squat', dateSelect.value, v); });
+    btnPushup.addEventListener('click', async ()=>{ const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser)); const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{}; return (dl[dateSelect.value]?.pushup)||0; })(); const v = await showRepsModal('伏地挺身', cur); if (v===null) return; await saveReps('pushup', dateSelect.value, v); });
+    btnRowing.addEventListener('click', async ()=>{ const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser)); const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{}; return (dl[dateSelect.value]?.rowing)||0; })(); const v = await showRepsModal('划船', cur); if (v===null) return; await saveReps('rowing', dateSelect.value, v); });
 
-    btnSquat .addEventListener('click', async ()=>{
-      const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser));
-        const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{};
-        return (dl[dateSelect.value]?.squat)||0; })();
-      const v = await showRepsModal('深蹲', cur); if (v===null) return;
-      await saveReps('squat', dateSelect.value, v);
-    });
-    btnPushup.addEventListener('click', async ()=>{
-      const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser));
-        const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{};
-        return (dl[dateSelect.value]?.pushup)||0; })();
-      const v = await showRepsModal('伏地挺身', cur); if (v===null) return;
-      await saveReps('pushup', dateSelect.value, v);
-    });
-    btnRowing.addEventListener('click', async ()=>{
-      const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser));
-        const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{};
-        return (dl[dateSelect.value]?.rowing)||0; })();
-      const v = await showRepsModal('划船', cur); if (v===null) return;
-      await saveReps('rowing', dateSelect.value, v);
-    });
+    function showRepsModal(type, initial){ return new Promise((resolve)=>{ repsModalTitle.textContent=`編輯${type}數量`; repsModalText.textContent=`請輸入你在 ${dateSelect.value} 完成的 ${type} 數量：`; repsInput.value = initial ?? ''; repsModal.style.display='flex'; repsInput.focus(); const onConfirm=()=>{ repsModal.style.display='none'; const v=parseInt(repsInput.value,10); resolve(Number.isFinite(v)&&v>=0 ? v : null); cleanup(); }; const onCancel =()=>{ repsModal.style.display='none'; resolve(null); cleanup(); }; function cleanup(){ repsModalConfirm.removeEventListener('click',onConfirm); repsModalCancel .removeEventListener('click',onCancel); } repsModalConfirm.addEventListener('click',onConfirm); repsModalCancel .addEventListener('click',onCancel); }); }
 
-    function showRepsModal(type, initial){
-      return new Promise((resolve)=>{
-        repsModalTitle.textContent=`編輯${type}數量`;
-        repsModalText.textContent=`請輸入你在 ${dateSelect.value} 完成的 ${type} 數量：`;
-        repsInput.value = initial ?? '';
-        repsModal.style.display='flex';
-        repsInput.focus();
-
-        const onConfirm=()=>{ repsModal.style.display='none';
-          const v=parseInt(repsInput.value,10);
-          resolve(Number.isFinite(v)&&v>=0 ? v : null); cleanup(); };
-        const onCancel =()=>{ repsModal.style.display='none'; resolve(null); cleanup(); };
-        function cleanup(){
-          repsModalConfirm.removeEventListener('click',onConfirm);
-          repsModalCancel .removeEventListener('click',onCancel);
-        }
-        repsModalConfirm.addEventListener('click',onConfirm);
-        repsModalCancel .addEventListener('click',onCancel);
-      });
-    }
-
-    nameModalConfirm.addEventListener('click', async ()=>{
-      const v = nameInput.value.trim();
-      if (!v) return;
-      try{ await saveOwnName(v); }catch(e){ alert(`更新名稱失敗：${e.code||e.message}`); }
-      nameModal.style.display='none';
-    });
+    nameModalConfirm.addEventListener('click', async ()=>{ const v = nameInput.value.trim(); if (!v) return; try{ await saveOwnName(v); }catch(e){ alert(`更新名稱失敗：${e.code||e.message}`); } nameModal.style.display='none'; });
     nameModalCancel.addEventListener('click', ()=> nameModal.style.display='none');
 
-    // ===== 自動登入 =====
-    (async function boot(){
-      const savedU = localStorage.getItem('currentUser');
-      const savedR = localStorage.getItem('currentRoundId');
-      initDate();
-      if (savedU && savedR === ROUND_ID){
-        currentUser = savedU;
-        showApp();
-      } else {
-        showLogin();
-      }
-    })();
+    // 自動登入
+    (async function boot(){ const savedU = localStorage.getItem('currentUser'); const savedR = localStorage.getItem('currentRoundId'); initDate(); if (savedU && savedR === ROUND_ID){ currentUser = savedU; showApp(); } else { showLogin(); } })();
   </script>
 </body>
 </html>
