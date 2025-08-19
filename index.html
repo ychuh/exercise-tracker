@@ -253,7 +253,7 @@
     dateSelect.addEventListener('change', renderHints);
 
     // 修仙境界（依總次數）
-    function realmFromTotal(total){ const t = Math.max(0, total || 0); const steps = [ { id:'qi',        at:100,  name:'煉氣期', emoji:'🌱', color:'emerald' }, { id:'foundation',at:500,  name:'築基期', emoji:'🧱', color:'amber'   }, { id:'core',      at:1000, name:'金丹期', emoji:'🔮', color:'violet'  }, { id:'infant',    at:1500, name:'元嬰期', emoji:'👶', color:'sky'     }, { id:'spirit',    at:2000, name:'化神期', emoji:'🔥', color:'orange'  }, { id:'ascend',    at:2500, name:'飛升',   emoji:'🕊️', color:'amber'   }, ]; let current = { id:'mortal', at:0, name:'凡人', emoji:'🙂', color:'gray' }; let next = steps[0]; for (const s of steps){ if (t >= s.at) { current = s; next = null; } else { next = s; break; } } const pct    = Math.min(100, (t / 2500) * 100); const remain = next ? Math.max(0, next.at - t) : 0; return { current, next, pct, remain }; }
+    function realmFromTotal(total){ const t = Math.max(0, total || 0); const steps = [ { id:'qi',        at:100,  name:'煉氣期', emoji:'🍃', color:'emerald' }, { id:'foundation',at:500,  name:'築基期', emoji:'🪨', color:'amber'   }, { id:'core',      at:1000, name:'金丹期', emoji:'🌕', color:'violet'  }, { id:'infant',    at:1500, name:'元嬰期', emoji:'🍼', color:'sky'     }, { id:'spirit',    at:2000, name:'化神期', emoji:'⚡', color:'orange'  }, { id:'ascend',    at:2500, name:'飛升',   emoji:'🚀', color:'amber'   }, ]; let current = { id:'mortal', at:0, name:'凡人', emoji:'🙂', color:'gray' }; let next = steps[0]; for (const s of steps){ if (t >= s.at) { current = s; next = null; } else { next = s; break; } } const pct    = Math.min(100, (t / 2500) * 100); const remain = next ? Math.max(0, next.at - t) : 0; return { current, next, pct, remain }; }
     function sumFromDaily(daily){ let tot = 0; for (const k in (daily||{})) { const r = daily[k] || {}; tot += (r.squat||0)+(r.pushup||0)+(r.rowing||0); } return tot; }
 
     // ===== 帳號登入（自管） =====
@@ -268,12 +268,12 @@
 
     /* ===== 徽章定義 ===== */
     const BADGES = [
-      { id:'realm_qi_100',        emoji:'🌱', title:'煉氣期', desc:'累積 100 下',        test:(s)=> s.totalFromDaily>=100 },
-      { id:'realm_found_500',     emoji:'🧱', title:'築基期', desc:'累積 500 下',        test:(s)=> s.totalFromDaily>=500 },
-      { id:'realm_core_1000',     emoji:'🔮', title:'金丹期', desc:'累積 1,000 下',      test:(s)=> s.totalFromDaily>=1000 },
-      { id:'realm_infant_1500',   emoji:'👶', title:'元嬰期', desc:'累積 1,500 下',      test:(s)=> s.totalFromDaily>=1500 },
-      { id:'realm_spirit_2000',   emoji:'🔥', title:'化神期', desc:'累積 2,000 下',      test:(s)=> s.totalFromDaily>=2000 },
-      { id:'realm_ascend_2500',   emoji:'🕊️', title:'飛升',   desc:'累積 2,500 下（封頂）', test:(s)=> s.totalFromDaily>=2500 },
+      { id:'realm_qi_100',        emoji:'🍃', title:'煉氣期', desc:'累積 100 下',        test:(s)=> s.totalFromDaily>=100 },
+      { id:'realm_found_500',     emoji:'🪨', title:'築基期', desc:'累積 500 下',        test:(s)=> s.totalFromDaily>=500 },
+      { id:'realm_core_1000',     emoji:'🌕', title:'金丹期', desc:'累積 1,000 下',      test:(s)=> s.totalFromDaily>=1000 },
+      { id:'realm_infant_1500',   emoji:'🍼', title:'元嬰期', desc:'累積 1,500 下',      test:(s)=> s.totalFromDaily>=1500 },
+      { id:'realm_spirit_2000',   emoji:'⚡', title:'化神期', desc:'累積 2,000 下',      test:(s)=> s.totalFromDaily>=2000 },
+      { id:'realm_ascend_2500',   emoji:'🚀', title:'飛升',   desc:'累積 2,500 下（封頂）', test:(s)=> s.totalFromDaily>=2500 },
       { id:'streak_3',  emoji:'🧘', title:'小閉關',       desc:'連續 3 日',   test:(s)=> s.streak>=3  },
       { id:'streak_7',  emoji:'🧘', title:'七日坐忘',     desc:'連續 7 日',   test:(s)=> s.streak>=7  },
       { id:'streak_14', emoji:'🧘', title:'十四日入定',   desc:'連續 14 日',  test:(s)=> s.streak>=14 },
@@ -432,8 +432,8 @@
         card.innerHTML = `
           <!-- 區塊1：Header -->
           <div class="absolute -top-2 -right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded-full">#${idx+1}</div>
-          <header class="flex items-center gap-3 mb-2">
-            <div class="h-10 w-10 rounded-xl bg-gray-100 grid place-items-center text-gray-700 font-bold">${(p.name||id).slice(0,1).toUpperCase()}</div>
+          <header class="flex items-center gap-3 mb-3">
+            <div class="h-10 w-10 rounded-full bg-gray-100 grid place-items-center text-blue-600 font-semibold">${(p.name||id).slice(0,1).toUpperCase()}</div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2">
                 <h3 class="font-semibold truncate">${p.name||id}</h3>
@@ -470,7 +470,7 @@
               <span>${realm.next ? `距「${realm.next.name}」還差 ${realm.remain}` : '已封頂'}</span>
             </div>
             <div class="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
-              <div class="h-full ${theme.bar}" style="width:${realm.pct.toFixed(2)}%"></div>
+              <div class="h-full bg-blue-500 transition-all" style="width:${realm.pct.toFixed(2)}%"></div>
             </div>
           </section>
 
@@ -479,12 +479,12 @@
             <div class="flex items-center gap-2 flex-wrap">
               ${(() => {
                 const realmSteps = [
-                  {at:2500, txt:'🕊️ 飛升'},
-                  {at:2000, txt:'🔥 化神'},
-                  {at:1500, txt:'👶 元嬰'},
-                  {at:1000, txt:'🔮 金丹'},
-                  {at:500,  txt:'🧱 築基'},
-                  {at:100,  txt:'🌱 煉氣'},
+					{at:2500, txt:'🌌 飛升'},   // 銀河/宇宙感，升天突破
+					{at:2000, txt:'⚡ 化神'},   // 電光一閃，比 🔥 更神性
+					{at:1500, txt:'🍼 元嬰'},   // 奶瓶，比 👶 更俏皮
+					{at:1000, txt:'🌕 金丹'},   // 滿月 → 圓滿丹藥意象
+					{at:500,  txt:'🪨 築基'},   // 石頭 → 穩固基礎
+					{at:100,  txt:'🍃 煉氣'},   // 飄落葉子，比 🌿 更輕盈
                 ];
                 let realmTop = null; for (const s of realmSteps) { if (total >= s.at) { realmTop = s; break; } }
                 const streakSteps = [ {d:30, txt:'🧘 30日'}, {d:21, txt:'🧘 21日'}, {d:14, txt:'🧘 14日'}, {d:7, txt:'🧘 7日'}, {d:3, txt:'🧘 3日'} ];
