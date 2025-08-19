@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>運動挑戰追蹤器</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Favicon & PWA -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192-v2.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512-v2.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+
   <style>
     body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans TC',sans-serif;background:#f3f4f6;color:#1f2937}
     .daily-log-table-container{overflow-x:auto}
@@ -16,7 +23,8 @@
     @media (max-width: 767px){ .card { border-radius: 16px; } }
   </style>
 </head>
-<body class="p-4 md:p-10 min-h-screen flex items-start md:items-center justify-center">
+<body class="p-4 md:p-10 min-h-screen flex items-start md:items-center justify-center"
+      style="padding-bottom: calc(env(safe-area-inset-bottom) + 96px);">
 
   <!-- 登入頁 -->
   <div id="login-page" class="w-full max-w-md p-6 md:p-8 bg-white rounded-2xl shadow-xl card">
@@ -131,16 +139,44 @@
     </div>
   </div>
 
-  <!-- 手機底部快操作列（登入前隱藏） -->
-  <nav id="quickbar" class="fixed md:hidden bottom-0 inset-x-0 z-50 hidden">
-    <div class="mx-auto max-w-6xl">
-      <div class="m-3 rounded-2xl bg-white/95 backdrop-blur border border-gray-300 p-2 grid grid-cols-3 gap-2 shadow-lg">
-        <button class="rounded-xl py-3 font-semibold bg-blue-600 text-white active:scale-[.98]" onclick="document.getElementById('btn-squat').click()">+ 深蹲</button>
-        <button class="rounded-xl py-3 font-semibold bg-green-600 text-white active:scale-[.98]" onclick="document.getElementById('btn-pushup').click()">+ 伏地</button>
-        <button class="rounded-xl py-3 font-semibold bg-red-600 text-white active:scale-[.98]" onclick="document.getElementById('btn-rowing').click()">+ 划船</button>
+<!-- 手機底部快操作列（登入前隱藏） -->
+<nav id="quickbar" class="fixed md:hidden bottom-0 inset-x-0 z-[60] hidden select-none">
+  <div class="mx-auto max-w-6xl">
+    <div class="m-3 rounded-2xl bg-white/95 backdrop-blur border border-gray-300 p-2 shadow-xl">
+      <div class="grid grid-cols-3 gap-2">
+        <!-- 深蹲 -->
+        <button
+          class="h-14 rounded-full font-semibold bg-blue-600 text-white active:scale-95 shadow-md flex items-center justify-center gap-2"
+          onclick="document.getElementById('btn-squat').click()"
+          aria-label="新增深蹲">
+          <span class="text-lg">🏋️</span>
+          <span class="text-sm">深蹲</span>
+        </button>
+
+        <!-- 伏地挺身 -->
+        <button
+          class="h-14 rounded-full font-semibold bg-green-600 text-white active:scale-95 shadow-md flex items-center justify-center gap-2"
+          onclick="document.getElementById('btn-pushup').click()"
+          aria-label="新增伏地挺身">
+          <span class="text-lg">💪</span>
+          <span class="text-sm">伏地</span>
+        </button>
+
+        <!-- 划船 -->
+        <button
+          class="h-14 rounded-full font-semibold bg-red-600 text-white active:scale-95 shadow-md flex items-center justify-center gap-2"
+          onclick="document.getElementById('btn-rowing').click()"
+          aria-label="新增划船">
+          <span class="text-lg">🚣</span>
+          <span class="text-sm">划船</span>
+        </button>
       </div>
+
+      <!-- 安全區填充，避免 iOS 手勢區壓到按鈕 -->
+      <div class="pt-1" style="padding-bottom: env(safe-area-inset-bottom);"></div>
     </div>
-  </nav>
+  </div>
+</nav>
 
   <!-- 數量 Modal -->
   <div id="reps-modal" class="modal">
@@ -304,7 +340,7 @@
     function realmFromTotal(total){
       const t = Math.max(0, total || 0);
       const steps = [
-        { id:'qi',        at:100,  name:'練氣期', emoji:'🌱', color:'emerald' },
+        { id:'qi',        at:100,  name:'煉氣期', emoji:'🌱', color:'emerald' },
         { id:'foundation',at:500,  name:'築基期', emoji:'🧱', color:'amber'   },
         { id:'core',      at:1000, name:'金丹期', emoji:'🔮', color:'violet'  },
         { id:'infant',    at:1500, name:'元嬰期', emoji:'👶', color:'sky'     },
