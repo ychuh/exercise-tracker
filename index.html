@@ -7,19 +7,20 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Favicon & PWA -->
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192-v2.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="icon-512-v2.png">  
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#2563eb" />
-	<!-- iOS Safari 老方法，雖然 deprecated 但還需要 -->
+	<!-- manifest & icons（和 index.html 同層時） -->
+	<link rel="manifest" href="./manifest.json">
+
+	<link rel="icon" type="image/png" sizes="192x192" href="./icon-192-v2.png">
+	<link rel="icon" type="image/png" sizes="512x512" href="./icon-512-v2.png">
+
+	<!-- iOS 專用 icon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+
+	<!-- PWA meta（兼容 iOS/Android） -->
 	<meta name="apple-mobile-web-app-capable" content="yes">
-
-	<!-- Android/Chrome 新方法 -->
 	<meta name="mobile-web-app-capable" content="yes">
-
-	<!-- 顏色可選，iOS 狀態列樣式 -->
 	<meta name="apple-mobile-web-app-status-bar-style" content="default">
+	<meta name="theme-color" content="#2563eb">
 
   <style>
     body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans TC',sans-serif;background:#f3f4f6;color:#1f2937}
