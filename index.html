@@ -12,8 +12,14 @@
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2563eb" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+	<!-- iOS Safari 老方法，雖然 deprecated 但還需要 -->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+
+	<!-- Android/Chrome 新方法 -->
+	<meta name="mobile-web-app-capable" content="yes">
+
+	<!-- 顏色可選，iOS 狀態列樣式 -->
+	<meta name="apple-mobile-web-app-status-bar-style" content="default">
 
   <style>
     body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans TC',sans-serif;background:#f3f4f6;color:#1f2937}
@@ -475,7 +481,7 @@
 
     /* ===== 徽章定義（只看 totalFromDaily） ===== */
     const BADGES = [
-      { id:'realm_qi_100',        emoji:'🌱', title:'練氣期', desc:'累積 100 下',        test:(s)=> s.totalFromDaily>=100 },
+      { id:'realm_qi_100',        emoji:'🌱', title:'煉氣期', desc:'累積 100 下',        test:(s)=> s.totalFromDaily>=100 },
       { id:'realm_found_500',     emoji:'🧱', title:'築基期', desc:'累積 500 下',        test:(s)=> s.totalFromDaily>=500 },
       { id:'realm_core_1000',     emoji:'🔮', title:'金丹期', desc:'累積 1,000 下',      test:(s)=> s.totalFromDaily>=1000 },
       { id:'realm_infant_1500',   emoji:'👶', title:'元嬰期', desc:'累積 1,500 下',      test:(s)=> s.totalFromDaily>=1500 },
@@ -491,7 +497,7 @@
 
     // === 同義對照表（把舊ID/中文名映射到 canonical）===
     const BADGE_CANON = {
-      realm_qi_100:      ['realm_qi_100','練氣期','total_100','百煉成鋼'],
+      realm_qi_100:      ['realm_qi_100','煉氣期','total_100','百煉成鋼'],
       realm_found_500:   ['realm_found_500','築基期','total_500','五百破關'],
       realm_core_1000:   ['realm_core_1000','金丹期','total_1000'],
       realm_infant_1500: ['realm_infant_1500','元嬰期'],
@@ -862,7 +868,7 @@
 
         // —— 只取「最高」境界徽章
         const realmSteps = [
-          {at:100,  txt:'🌱 練氣'},
+          {at:100,  txt:'🌱 煉氣'},
           {at:500,  txt:'🧱 築基'},
           {at:1000, txt:'🔮 金丹'},
           {at:1500, txt:'👶 元嬰'},
