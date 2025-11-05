@@ -106,10 +106,10 @@
             <svg class="w-5 h-5"><use href="#icon-walk"/></svg>
             <span class="text-sm">深蹲</span>
           </button>
-          <!-- 伏地挺身 -->
-          <button class="h-14 rounded-xl font-semibold bg-white border border-gray-300 text-gray-700 active:scale-95 shadow-sm flex items-center justify-center gap-2" onclick="document.getElementById('btn-pushup').click()" aria-label="新增伏地挺身">
+          <!-- 橋式挺身 -->
+          <button class="h-14 rounded-xl font-semibold bg-white border border-gray-300 text-gray-700 active:scale-95 shadow-sm flex items-center justify-center gap-2" onclick="document.getElementById('btn-pushup').click()" aria-label="新增橋式挺身">
             <svg class="w-5 h-5"><use href="#icon-pushup"/></svg>
-            <span class="text-sm">伏地</span>
+            <span class="text-sm">橋式</span>
           </button>
           <!-- 划船 -->
           <button class="h-14 rounded-xl font-semibold bg-white border border-gray-300 text-gray-700 active:scale-95 shadow-sm flex items-center justify-center gap-2" onclick="document.getElementById('btn-rowing').click()" aria-label="新增划船">
@@ -450,7 +450,7 @@
             <div class="flex justify-around text-center">
               ${[ 
                 {k:'squat',  label:'深蹲',  icon:'walk',   v: today.squat||0},
-                {k:'pushup', label:'伏地',  icon:'pushup', v: today.pushup||0},
+                {k:'pushup', label:'橋式',  icon:'pushup', v: today.pushup||0},
                 {k:'rowing', label:'划船',  icon:'row',    v: today.rowing||0},
               ].map(a => `
                 <div class="px-1 py-1 text-center">
@@ -509,7 +509,7 @@
     logoutBtn.addEventListener('click', ()=>{ localStorage.removeItem('currentUser'); localStorage.removeItem('currentRoundId'); currentUser = null; showLogin(); });
 
     btnSquat.addEventListener('click', async ()=>{ const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser)); const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{}; return (dl[dateSelect.value]?.squat)||0; })(); const v = await showRepsModal('深蹲', cur); if (v===null) return; await saveReps('squat', dateSelect.value, v); });
-    btnPushup.addEventListener('click', async ()=>{ const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser)); const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{}; return (dl[dateSelect.value]?.pushup)||0; })(); const v = await showRepsModal('伏地挺身', cur); if (v===null) return; await saveReps('pushup', dateSelect.value, v); });
+    btnPushup.addEventListener('click', async ()=>{ const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser)); const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{}; return (dl[dateSelect.value]?.pushup)||0; })(); const v = await showRepsModal('橋式挺身', cur); if (v===null) return; await saveReps('pushup', dateSelect.value, v); });
     btnRowing.addEventListener('click', async ()=>{ const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser)); const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{}; return (dl[dateSelect.value]?.rowing)||0; })(); const v = await showRepsModal('划船', cur); if (v===null) return; await saveReps('rowing', dateSelect.value, v); });
 
     function showRepsModal(type, initial){ return new Promise((resolve)=>{ repsModalTitle.textContent=`編輯${type}數量`; repsModalText.textContent=`請輸入你在 ${dateSelect.value} 完成的 ${type} 數量：`; repsInput.value = initial ?? ''; repsModal.style.display='flex'; repsInput.focus(); const onConfirm=()=>{ repsModal.style.display='none'; const v=parseInt(repsInput.value,10); resolve(Number.isFinite(v)&&v>=0 ? v : null); cleanup(); }; const onCancel =()=>{ repsModal.style.display='none'; resolve(null); cleanup(); }; function cleanup(){ repsModalConfirm.removeEventListener('click',onConfirm); repsModalCancel .removeEventListener('click',onCancel); } repsModalConfirm.addEventListener('click',onConfirm); repsModalCancel .addEventListener('click',onCancel); }); }
@@ -522,4 +522,5 @@
   </script>
 </body>
 </html>
+
 
