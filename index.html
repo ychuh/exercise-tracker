@@ -49,7 +49,7 @@
     <!-- 頂部 -->
     <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-0 mb-4">
       <div class="space-y-1">
-        <h1 class="text-2xl md:text-3xl font-bold text-blue-800">30天運動挑戰</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-blue-800">60天運動挑戰</h1>
         <div class="text-sm text-gray-600">目前輪次：<span id="round-label" class="font-semibold"></span>，日期：<span id="range-label"></span></div>
       </div>
       <div class="flex items-center gap-3">
@@ -66,6 +66,9 @@
       <div id="countdown" class="text-sm text-gray-600"></div>
       <div id="today-tip" class="text-sm text-gray-600"></div>
     </div>
+
+    <!-- 目標 -->
+    <p class="text-gray-600 text-center mb-4 md:mb-6">目標：60天內完成總計 <span class="font-semibold">5500</span> 下運動</p>
 
     <!-- 日期選擇 -->
     <div class="flex items-center justify-center gap-3 md:gap-4 mb-6">
@@ -93,6 +96,7 @@
     <!-- Admin 工具（?admin=1 顯示） -->
     <div id="admin-tools" class="hidden mt-4 text-center">
       <button id="btn-dedupe" class="px-3 py-1.5 text-xs rounded-md border border-gray-300 hover:bg-gray-100">清理重複徽章＋修復為正確狀態（僅自己）</button>
+      <button id="btn-seed-prev" class="ml-2 px-3 py-1.5 text-xs rounded-md border border-blue-300 text-blue-700 hover:bg-blue-50">從上一輪帶入參賽者（只帶名稱，清空紀錄）</button>
     </div>
   </div>
 
@@ -100,21 +104,22 @@
   <nav id="quickbar" class="fixed md:hidden bottom-0 inset-x-0 z-[60] hidden select-none">
     <div class="mx-auto max-w-6xl">
       <div class="m-3 rounded-2xl bg-white/95 backdrop-blur border border-gray-300 p-2 shadow-xl">
-        <div class="grid grid-cols-3 gap-2">
+        <div class="grid grid-cols-4 gap-2">
           <!-- 深蹲 -->
-          <button class="h-14 rounded-xl font-semibold bg-white border border-gray-300 text-gray-700 active:scale-95 shadow-sm flex items-center justify-center gap-2" onclick="document.getElementById('btn-squat').click()" aria-label="新增深蹲">
+          <button class="h-14 rounded-full font-semibold bg-white border border-gray-300 text-gray-700 active:scale-95 shadow-sm flex items-center justify-center gap-2" onclick="document.getElementById('btn-squat').click()" aria-label="新增深蹲">
             <svg class="w-5 h-5"><use href="#icon-walk"/></svg>
             <span class="text-sm">深蹲</span>
           </button>
-          <!-- 橋式挺身 -->
-          <button class="h-14 rounded-xl font-semibold bg-white border border-gray-300 text-gray-700 active:scale-95 shadow-sm flex items-center justify-center gap-2" onclick="document.getElementById('btn-pushup').click()" aria-label="新增橋式挺身">
+          <!-- 伏地挺身 -->
+          <button class="h-14 rounded-full font-semibold bg-white border border-gray-300 text-gray-700 active:scale-95 shadow-sm flex items-center justify-center gap-2" onclick="document.getElementById('btn-pushup').click()" aria-label="新增伏地挺身">
             <svg class="w-5 h-5"><use href="#icon-pushup"/></svg>
-            <span class="text-sm">橋式</span>
+            <span class="text-sm">伏地</span>
           </button>
-          <!-- 划船 -->
-          <button class="h-14 rounded-xl font-semibold bg-white border border-gray-300 text-gray-700 active:scale-95 shadow-sm flex items-center justify-center gap-2" onclick="document.getElementById('btn-rowing').click()" aria-label="新增划船">
-            <svg class="w-5 h-5"><use href="#icon-row"/></svg>
-            <span class="text-sm">划船</span>
+          $1
+          <!-- 橋式 -->
+          <button class="h-14 rounded-full font-semibold bg-white border border-gray-300 text-gray-700 active:scale-95 shadow-sm flex items-center justify-center gap-2" onclick="document.getElementById('btn-bridge').click()" aria-label="新增橋式">
+            <svg class="w-5 h-5"><use href="#icon-bridge"/></svg>
+            <span class="text-sm">橋式</span>
           </button>
         </div>
         <div class="pt-1" style="padding-bottom: env(safe-area-inset-bottom);"></div>
@@ -162,6 +167,11 @@
       <path d="M4 15c2.5 2 13.5 2 16 0l-2 3H6l-2-3Z" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linejoin="round"/>
       <path d="M10 9l6 6M17 7l2 2-3 3-2-2 3-3Z" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </symbol>
+    <symbol id="icon-bridge" viewBox="0 0 24 24">
+      <path d="M3 16h18" stroke="#E5E7EB" stroke-width="2" stroke-linecap="round"/>
+      <path d="M5 16c2-4 12-4 14 0" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
+      <path d="M9 16v-2m6 2v-2" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
   </svg>
 
   <!-- Firebase + App（純卡片版） -->
@@ -173,6 +183,7 @@
     const CHALLENGE_START = '2025-11-05';
     const CHALLENGE_END   = '2025-12-31';
     const ROUND_ID        = `第三輪`;
+    const PREV_ROUND_ID   = `第二輪`; // 用於帶入上一輪名單（不帶紀錄）
     /* ================================================ */
 
     const firebaseConfig = {
@@ -236,10 +247,46 @@
     const btnSquat  = document.createElement('button'); btnSquat.id='btn-squat'; btnSquat.className='hidden'; document.body.appendChild(btnSquat);
     const btnPushup = document.createElement('button'); btnPushup.id='btn-pushup'; btnPushup.className='hidden'; document.body.appendChild(btnPushup);
     const btnRowing = document.createElement('button'); btnRowing.id='btn-rowing'; btnRowing.className='hidden'; document.body.appendChild(btnRowing);
+    const btnBridge = document.createElement('button'); btnBridge.id='btn-bridge'; btnBridge.className='hidden'; document.body.appendChild(btnBridge);
 
     // Admin 開關（?admin=1 顯示工具）
     const isAdmin = new URLSearchParams(location.search).get('admin') === '1';
     if (isAdmin) adminTools.classList.remove('hidden');
+
+    // Admin：從上一輪帶入名單（不複製任何數據，只建立空白參加者紀錄）
+    async function seedParticipantsFromPrevRound(){
+      if (!confirm(`確定要從「${PREV_ROUND_ID}」帶入參賽者到「${ROUND_ID}」？
+不會帶入任何運動紀錄，只建立名稱與基本欄位。`)) return;
+      try{
+        const prevCol = collection(db, `rounds/${PREV_ROUND_ID}/participants`);
+        const curCol  = collection(db, `rounds/${ROUND_ID}/participants`);
+        const snap = await getDocs(prevCol);
+        let created = 0, skipped = 0;
+        for (const docSnap of snap.docs){
+          const id = docSnap.id;
+          const exists = await getDoc(doc(db, `rounds/${ROUND_ID}/participants`, id));
+          if (exists.exists()) { skipped++; continue; }
+          const d = docSnap.data() || {};
+          await setDoc(doc(db, `rounds/${ROUND_ID}/participants`, id), {
+            name: d.name || id,
+            creatorId: d.creatorId || id,
+            squat: 0, pushup: 0, rowing: 0, bridge: 0, total: 0,
+            dailyLog: JSON.stringify({}),
+            updatedAt: new Date().toISOString(),
+            roundId: ROUND_ID
+          }, { merge: true });
+          created++;
+        }
+        alert(`已完成帶入：建立 ${created} 位；略過已存在 ${skipped} 位。`);
+      }catch(e){
+        console.error(e);
+        alert(`帶入失敗：${e.code || e.message}`);
+      }
+    }
+    if (isAdmin) {
+      const seedBtn = document.getElementById('btn-seed-prev');
+      seedBtn?.addEventListener('click', seedParticipantsFromPrevRound);
+    }
 
     // ===== 小工具 =====
     async function sha256(str){ const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
@@ -253,11 +300,32 @@
     dateSelect.addEventListener('change', renderHints);
 
     // 修仙境界（依總次數）
-    function realmFromTotal(total){ const t = Math.max(0, total || 0); const steps = [ { id:'qi',        at:100,  name:'煉氣期', emoji:'🍃', color:'emerald' }, { id:'foundation',at:500,  name:'築基期', emoji:'🪨', color:'amber'   }, { id:'core',      at:1000, name:'金丹期', emoji:'🌕', color:'violet'  }, { id:'infant',    at:1500, name:'元嬰期', emoji:'🍼', color:'sky'     }, { id:'spirit',    at:2000, name:'化神期', emoji:'⚡', color:'orange'  }, { id:'ascend',    at:2500, name:'飛升',   emoji:'🚀', color:'amber'   }, ]; let current = { id:'mortal', at:0, name:'凡人', emoji:'🙂', color:'gray' }; let next = steps[0]; for (const s of steps){ if (t >= s.at) { current = s; next = null; } else { next = s; break; } } const pct    = Math.min(100, (t / 2500) * 100); const remain = next ? Math.max(0, next.at - t) : 0; return { current, next, pct, remain }; }
-    function sumFromDaily(daily){ let tot = 0; for (const k in (daily||{})) { const r = daily[k] || {}; tot += (r.squat||0)+(r.pushup||0)+(r.rowing||0); } return tot; }
+    function realmFromTotal(total){ const t = Math.max(0, total || 0); const steps = [ { id:'qi',        at:100,  name:'煉氣期', emoji:'🌱', color:'emerald' }, { id:'foundation',at:500,  name:'築基期', emoji:'🧱', color:'amber'   }, { id:'core',      at:1000, name:'金丹期', emoji:'🔮', color:'violet'  }, { id:'infant',    at:1500, name:'元嬰期', emoji:'👶', color:'sky'     }, { id:'spirit',    at:2000, name:'化神期', emoji:'🔥', color:'orange'  }, { id:'ascend',    at:2500, name:'飛升',   emoji:'🕊️', color:'amber'   }, ]; let current = { id:'mortal', at:0, name:'凡人', emoji:'🙂', color:'gray' }; let next = steps[0]; for (const s of steps){ if (t >= s.at) { current = s; next = null; } else { next = s; break; } } const pct    = Math.min(100, (t / 2500) * 100); const remain = next ? Math.max(0, next.at - t) : 0; return { current, next, pct, remain }; }
+    function calcStreak(daily, dateStr){
+      const dates = dateRange().map(d => fmtDate(d));
+      const todayDefault = fmtDate(clampDateToRange(new Date()));
+      let i = dates.indexOf(dateStr || todayDefault);
+      if (i < 0) i = dates.length - 1;
+      let streak = 0;
+      for (; i >= 0; i--) {
+        const r = daily?.[dates[i]] || {};
+        const sum = (r.squat||0) + (r.pushup||0) + (r.rowing||0) + (r.bridge||0);
+        if (sum > 0) streak++;
+        else break;
+      }
+      return streak;
+    }
+    function sumFromDaily(daily){
+      let tot = 0;
+      for (const k in (daily || {})) {
+        const r = daily[k] || {};
+        tot += (r.squat||0) + (r.pushup||0) + (r.rowing||0) + (r.bridge||0);
+      }
+      return tot;
+    }
 
     // ===== 帳號登入（自管） =====
-    async function login(username, password){ loginErr.textContent=''; const acctRef = doc(db, 'accounts', username); const snap = await getDoc(acctRef); const pwdHash = await sha256(password); if (!snap.exists()){ await setDoc(acctRef, { passwordHash: pwdHash, createdAt: new Date().toISOString() }); } else { if (snap.data().passwordHash !== pwdHash){ throw new Error('密碼錯誤'); } } const pRef = doc(db, `rounds/${ROUND_ID}/participants`, username); const pSnap = await getDoc(pRef); if (!pSnap.exists()){ await setDoc(pRef, { name: username, creatorId: username, squat: 0, pushup: 0, rowing: 0, total: 0, dailyLog: JSON.stringify({}), updatedAt: new Date().toISOString(), roundId: ROUND_ID }); }
+    async function login(username, password){ loginErr.textContent=''; const acctRef = doc(db, 'accounts', username); const snap = await getDoc(acctRef); const pwdHash = await sha256(password); if (!snap.exists()){ await setDoc(acctRef, { passwordHash: pwdHash, createdAt: new Date().toISOString() }); } else { if (snap.data().passwordHash !== pwdHash){ throw new Error('密碼錯誤'); } } const pRef = doc(db, `rounds/${ROUND_ID}/participants`, username); const pSnap = await getDoc(pRef); if (!pSnap.exists()){ await setDoc(pRef, { name: username, creatorId: username, squat: 0, pushup: 0, rowing: 0, bridge: 0, total: 0, dailyLog: JSON.stringify({}), updatedAt: new Date().toISOString(), roundId: ROUND_ID }); }
       localStorage.setItem('currentUser', username); localStorage.setItem('currentRoundId', ROUND_ID); currentUser = username; }
 
     function showApp(){ loginPage.classList.add('hidden'); appPage.classList.remove('hidden'); quickbar?.classList.remove('hidden'); userName.textContent = currentUser || ''; userIdEl.textContent = currentUser || ''; initDate(); startParticipantsListener(); if (!badgesSyncedOnce) { badgesSyncedOnce = true; checkAndAward(currentUser); } }
@@ -268,12 +336,12 @@
 
     /* ===== 徽章定義 ===== */
     const BADGES = [
-      { id:'realm_qi_100',        emoji:'🍃', title:'煉氣期', desc:'累積 100 下',        test:(s)=> s.totalFromDaily>=100 },
-      { id:'realm_found_500',     emoji:'🪨', title:'築基期', desc:'累積 500 下',        test:(s)=> s.totalFromDaily>=500 },
-      { id:'realm_core_1000',     emoji:'🌕', title:'金丹期', desc:'累積 1,000 下',      test:(s)=> s.totalFromDaily>=1000 },
-      { id:'realm_infant_1500',   emoji:'🍼', title:'元嬰期', desc:'累積 1,500 下',      test:(s)=> s.totalFromDaily>=1500 },
-      { id:'realm_spirit_2000',   emoji:'⚡', title:'化神期', desc:'累積 2,000 下',      test:(s)=> s.totalFromDaily>=2000 },
-      { id:'realm_ascend_2500',   emoji:'🚀', title:'飛升',   desc:'累積 2,500 下（封頂）', test:(s)=> s.totalFromDaily>=2500 },
+      { id:'realm_qi_100',        emoji:'🌱', title:'煉氣期', desc:'累積 100 下',        test:(s)=> s.totalFromDaily>=100 },
+      { id:'realm_found_500',     emoji:'🧱', title:'築基期', desc:'累積 500 下',        test:(s)=> s.totalFromDaily>=500 },
+      { id:'realm_core_1000',     emoji:'🔮', title:'金丹期', desc:'累積 1,000 下',      test:(s)=> s.totalFromDaily>=1000 },
+      { id:'realm_infant_1500',   emoji:'👶', title:'元嬰期', desc:'累積 1,500 下',      test:(s)=> s.totalFromDaily>=1500 },
+      { id:'realm_spirit_2000',   emoji:'🔥', title:'化神期', desc:'累積 2,000 下',      test:(s)=> s.totalFromDaily>=2000 },
+      { id:'realm_ascend_2500',   emoji:'🕊️', title:'飛升',   desc:'累積 2,500 下（封頂）', test:(s)=> s.totalFromDaily>=2500 },
       { id:'streak_3',  emoji:'🧘', title:'小閉關',       desc:'連續 3 日',   test:(s)=> s.streak>=3  },
       { id:'streak_7',  emoji:'🧘', title:'七日坐忘',     desc:'連續 7 日',   test:(s)=> s.streak>=7  },
       { id:'streak_14', emoji:'🧘', title:'十四日入定',   desc:'連續 14 日',  test:(s)=> s.streak>=14 },
@@ -282,76 +350,8 @@
     ];
     const BADGE_INDEX = BADGES.reduce((m,b)=> (m[b.id]=b, m), {});
 
-	// -------- 工具：清理 undefined --------
-	function sanitizeData(obj){
-	  const safe = {};
-	  for (const [k, v] of Object.entries(obj)) {
-		if (v === undefined) {
-		  safe[k] = 0;   // 預設轉成 0，你也可以改成 null
-		} else if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
-		  safe[k] = sanitizeData(v);  // 遞迴處理物件
-		} else {
-		  safe[k] = v;
-		}
-	  }
-	  return safe;
-	}
-
-	// -------- 工具：計算連續天數 --------
-	function calcStreak(dailyLog){
-	  if (!dailyLog) return 0;
-
-	  const today = new Date();
-	  let d = new Date(today.toISOString().slice(0,10)); // 去掉時間部分
-	  let streak = 0;
-
-	  while (true) {
-		const key = d.toISOString().slice(0,10);
-		const log = dailyLog[key];
-
-		if (log && (
-			(log.squat || 0) > 0 ||
-			(log.pushup || 0) > 0 ||
-			(log.rowing || 0) > 0
-		)) {
-		  streak++;
-		  d.setDate(d.getDate() - 1);
-		} else {
-		  break;
-		}
-	  }
-	  return streak;
-	}
-
-	// -------- 工具：算出 context --------
-	function ctxFromParticipant(p){
-	  const dailyLog = (p && typeof p.dailyLog === 'object') ? p.dailyLog : {};
-
-	  const totalSquat = Object.values(dailyLog).reduce((a,v)=>a+(v.squat||0),0);
-	  const totalPush  = Object.values(dailyLog).reduce((a,v)=>a+(v.pushup||0),0);
-	  const totalRow   = Object.values(dailyLog).reduce((a,v)=>a+(v.rowing||0),0);
-
-	  const totalFromDaily = (totalSquat + totalPush + totalRow) || 0;
-
-	  return {
-		totalFromDaily,
-		total: totalFromDaily,   // 🔑 兩個一起存，避免 undefined
-		squat: totalSquat || 0,
-		pushup: totalPush || 0,
-		rowing: totalRow || 0,
-		streak: calcStreak(dailyLog) || 0,
-		dailyLog
-	  };
-	}
-
-	// -------- 主函式：更新參加者 --------
-	async function updateParticipant(userId, p){
-	  const ctx = ctxFromParticipant(p);
-	  const ref = doc(db, `rounds/${ROUND_ID}/participants`, userId);
-	  const safeData = sanitizeData(ctx);
-	  await setDoc(ref, safeData, { merge: true });
-	}
-
+    // 從 participant 計算徽章上下文（用今天，不吃 UI 日期）
+    function ctxFromParticipant(p){ const daily = p?.dailyLog || {}; const today = clampDateToRange(new Date()); const todayStr = fmtDate(today); const recToday = daily[todayStr] || {squat:0,pushup:0,rowing:0,bridge:0}; const todaySum = (recToday.squat||0)+(recToday.pushup||0)+(recToday.rowing||0)+(recToday.bridge||0); let totalFromDaily = 0; for (const k in daily) { const r = daily[k] || {}; totalFromDaily += (r.squat||0)+(r.pushup||0)+(r.rowing||0)+(r.bridge||0); } const dates = dateRange().map(d=>fmtDate(d)); let i = dates.indexOf(todayStr), streak = 0; for (; i >= 0; i--){ const r = daily[dates[i]]; const s = (r?.squat||0)+(r?.pushup||0)+(r?.rowing||0)+(r?.bridge||0); if (s > 0) streak++; else break; } return { totalFromDaily, todaySum, streak, todayStr }; }
 
     async function earnedBadgeIds(userId){ const list = await getDocs(collection(db, `rounds/${ROUND_ID}/participants/${userId}/badges`)); return new Set(list.docs.map(d=>d.id)); }
     function _ts(x){ return x?.toMillis ? x.toMillis() : Date.parse(x || 0) || 0; }
@@ -373,36 +373,14 @@
 
     function toast(msg){ const el = document.createElement('div'); el.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 bg-black text-white text-sm px-4 py-2 rounded-lg shadow-lg z-[9999]'; el.textContent = msg; document.body.appendChild(el); setTimeout(()=>{ el.remove(); }, 2500); }
 
-    // 成就區：只顯示「已解鎖」且「目前仍符合條件」的徽章（同義合併，新→舊）
-    async function renderBadges(userId){
-      const wrap = document.getElementById('badges-wrap');
-      if (!wrap) return;
-      wrap.innerHTML = '';
-
-      // 目前可得（依每日加總與連續天數）
-      const pSnap = await getDoc(doc(db, `rounds/${ROUND_ID}/participants`, userId));
-      let p = pSnap.data() || {};
-      if (p.dailyLog && typeof p.dailyLog === 'string'){
-        try{ p.dailyLog = JSON.parse(p.dailyLog); }catch{ p.dailyLog = {}; }
-      }
-	  const ctx = ctxFromParticipant(p);
-      const eligible = new Set(BADGES.filter(b => b.test(ctx)).map(b => b.id));
-
-      // 已解鎖（做同義合併與去重）
+    // 成就區：顯示「已解鎖」全部；若目前不符合條件則灰顯註記
+    async function renderBadges(userId){ const wrap = document.getElementById('badges-wrap'); if (!wrap) return; wrap.innerHTML = '';
+      if (!userId){ wrap.innerHTML = `<div class="text-center text-sm text-gray-500 py-3">請先登入</div>`; return; }
+      // 只顯示「已解鎖」徽章，不做當前是否符合的判斷
       const earned = await earnedBadgeList(userId);
-
-      // 僅顯示「已解鎖且目前仍符合」的徽章
-      const show = earned.filter(it => eligible.has(it.id));
-
-      if (!show.length){
-        wrap.innerHTML = `<div class="text-center text-sm text-gray-500 py-3">目前尚未解鎖任何徽章</div>`;
-        return;
-      }
-
-      for (const it of show){
-        const meta = BADGE_INDEX[it.id] || { emoji:'🏅', title: it.title || it.id, desc: it.desc || '' };
-        const card = document.createElement('div');
-        card.className = 'p-3 rounded-xl border border-blue-300 bg-blue-50 flex items-start gap-3';
+      if (!earned.length){ wrap.innerHTML = `<div class="text-center text-sm text-gray-500 py-3">目前尚未解鎖任何徽章</div>`; return; }
+      for (const it of earned){ const meta = BADGE_INDEX[it.id] || { emoji:'🏅', title: it.title || it.id, desc: it.desc || '' };
+        const card = document.createElement('div'); card.className = `p-3 rounded-xl border border-blue-300 bg-blue-50 flex items-start gap-3`;
         card.innerHTML = `
           <div class="text-2xl">${meta.emoji}</div>
           <div class="flex-1">
@@ -417,13 +395,13 @@
     // ===== 每日紀錄（僅每日表） =====
     function renderDailyLog(all){ dailyLogTableHead.innerHTML=''; dailyLogTableBody.innerHTML=''; const dates = dateRange(); const headerRow=document.createElement('tr'); headerRow.className='daily-log-table'; const nameHeader=document.createElement('th'); nameHeader.className='py-3 px-4 md:px-6 text-left'; nameHeader.textContent='參賽者'; headerRow.appendChild(nameHeader); dates.forEach(d=>{ const th=document.createElement('th'); th.className='py-3 px-2 text-center text-[11px]'; th.textContent=`${d.getMonth()+1}/${d.getDate()}`; headerRow.appendChild(th); }); dailyLogTableHead.appendChild(headerRow);
       const ids = Object.keys(all).sort((a,b)=>{ const ta=(all[a].name||a), tb=(all[b].name||b); return ta.localeCompare(tb,'zh-Hant'); });
-      ids.forEach(id=>{ const p = all[id]; const tr=document.createElement('tr'); tr.className='border-b border-gray-200 hover:bg-gray-50'; const nameCell=document.createElement('td'); nameCell.className='py-3 px-4 md:px-6 text-left whitespace-nowrap'; nameCell.textContent=p.name; tr.appendChild(nameCell); dates.forEach(d=>{ const key=fmtDate(d); const rec = (p.dailyLog||{})[key] || {squat:0,pushup:0,rowing:0}; const sum = (rec.squat||0)+(rec.pushup||0)+(rec.rowing||0); const td=document.createElement('td'); td.className='py-2.5 px-2 text-center text-xs'; td.textContent = sum>0 ? sum : '-'; tr.appendChild(td); }); dailyLogTableBody.appendChild(tr); }); }
+      ids.forEach(id=>{ const p = all[id]; const tr=document.createElement('tr'); tr.className='border-b border-gray-200 hover:bg-gray-50'; const nameCell=document.createElement('td'); nameCell.className='py-3 px-4 md:px-6 text-left whitespace-nowrap'; nameCell.textContent=p.name; tr.appendChild(nameCell); dates.forEach(d=>{ const key=fmtDate(d); const rec = (p.dailyLog||{})[key] || {squat:0,pushup:0,rowing:0,bridge:0}; const sum = (rec.squat||0)+(rec.pushup||0)+(rec.rowing||0)+(rec.bridge||0); const td=document.createElement('td'); td.className='py-2.5 px-2 text-center text-xs'; td.textContent = sum>0 ? sum : '-'; tr.appendChild(td); }); dailyLogTableBody.appendChild(tr); }); }
 
-    // ===== 卡片視圖（四分區：Header / 三欄動作 / 進度 / 徽章提示） =====
+    // ===== 卡片視圖（四分區：Header / 進度 / 三欄動作 / 徽章提示） =====
     function renderCards(all){ const cardsWrap = document.getElementById('cards-wrap'); if (!cardsWrap) return; cardsWrap.innerHTML = '';
       const ids = Object.keys(all).sort((a,b)=>{ const ta=(all[a].total||0), tb=(all[b].total||0); if (tb!==ta) return tb-ta; return (all[a].name||a).localeCompare(all[b].name||b,'zh-Hant'); });
       const todayStr = dateSelect.value;
-      ids.forEach((id, idx)=>{ const p = all[id]; const daily = p.dailyLog || {}; const today = daily[todayStr] || {squat:0,pushup:0,rowing:0}; const total = Number.isFinite(p.total) && p.total >= 0 ? p.total : sumFromDaily(daily); const streak = calcStreak(daily, todayStr); const realm  = realmFromTotal(total);
+      ids.forEach((id, idx)=>{ const p = all[id]; const daily = p.dailyLog || {}; const today = daily[todayStr] || {squat:0,pushup:0,rowing:0,bridge:0}; const total = Number.isFinite(p.total) && p.total >= 0 ? p.total : sumFromDaily(daily); const streak = calcStreak(daily, todayStr); const realm  = realmFromTotal(total);
         const theme = { emerald:{ chip:'bg-emerald-50 text-emerald-700 border border-emerald-200', bar:'bg-emerald-500', ring:'ring-emerald-200' }, amber:{ chip:'bg-amber-50 text-amber-700 border border-amber-200', bar:'bg-amber-500', ring:'ring-amber-200' }, violet:{ chip:'bg-violet-50 text-violet-700 border border-violet-200', bar:'bg-violet-500', ring:'ring-violet-200' }, sky:{ chip:'bg-sky-50 text-sky-700 border border-sky-200', bar:'bg-sky-500', ring:'ring-sky-200' }, orange:{ chip:'bg-orange-50 text-orange-700 border border-orange-200', bar:'bg-orange-500', ring:'ring-orange-200' }, gray:{ chip:'bg-gray-100 text-gray-700 border border-gray-200', bar:'bg-gray-500', ring:'ring-gray-200' } }[realm.current.color] || { chip:'bg-gray-100 text-gray-700 border border-gray-200', bar:'bg-gray-500', ring:'ring-gray-200' };
 
         // 四分區卡片樣式
@@ -432,8 +410,8 @@
         card.innerHTML = `
           <!-- 區塊1：Header -->
           <div class="absolute -top-2 -right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded-full">#${idx+1}</div>
-          <header class="flex items-center gap-3 mb-3">
-            <div class="h-10 w-10 rounded-full bg-gray-100 grid place-items-center text-blue-600 font-semibold">${(p.name||id).slice(0,1).toUpperCase()}</div>
+          <header class="flex items-center gap-3 pb-3 border-b border-gray-100">
+            <div class="h-10 w-10 rounded-xl bg-gray-100 grid place-items-center text-gray-700 font-bold">${(p.name||id).slice(0,1).toUpperCase()}</div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2">
                 <h3 class="font-semibold truncate">${p.name||id}</h3>
@@ -441,19 +419,31 @@
                   ${realm.current.emoji} ${realm.current.name}
                 </span>
               </div>
-              <p class="text-xs text-gray-500">連續 ${streak} 天</p>
+              <p class="text-xs text-gray-500">總計 ${total} 下 · 連續 ${streak} 天</p>
             </div>
           </header>
 
-          <!-- 區塊2：三欄動作（數字大在上、文字小在下） -->
-          <section class="">
-            <div class="flex justify-around text-center">
-              ${[ 
+          <!-- 區塊2：進度條 -->
+          <section class="pt-3 pb-3 border-b border-gray-100">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>修為 ${total} / 2,500</span>
+              <span>${realm.next ? `距「${realm.next.name}」還差 ${realm.remain}` : '已封頂'}</span>
+            </div>
+            <div class="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
+              <div class="h-full ${theme.bar}" style="width:${realm.pct.toFixed(2)}%"></div>
+            </div>
+          </section>
+
+          <!-- 區塊3：三欄動作（數字大在上、文字小在下） -->
+          <section class="pt-3 pb-3 border-b border-gray-100">
+            <div class="grid grid-cols-4 gap-2">
+              ${[
                 {k:'squat',  label:'深蹲',  icon:'walk',   v: today.squat||0},
-                {k:'pushup', label:'橋式',  icon:'pushup', v: today.pushup||0},
+                {k:'pushup', label:'伏地',  icon:'pushup', v: today.pushup||0},
                 {k:'rowing', label:'划船',  icon:'row',    v: today.rowing||0},
+                {k:'bridge', label:'橋式',  icon:'bridge', v: today.bridge||0},
               ].map(a => `
-                <div class="px-1 py-1 text-center">
+                <div class="px-2 py-2 rounded-lg border border-gray-200 bg-gray-50/40 text-center">
                   <div class="text-lg font-bold leading-none">${a.v}</div>
                   <div class="mt-1 text-[11px] text-gray-600 inline-flex items-center gap-1 justify-center">
                     <svg class="w-3.5 h-3.5"><use href="#icon-${a.icon}"/></svg>${a.label}
@@ -463,28 +453,17 @@
             </div>
           </section>
 
-          <!-- 區塊3：進度條 -->
-          <section class="mt-2">
-            <div class="flex justify-between text-xs text-gray-500 mb-1">
-              <span>修為 ${total} / 2,500</span>
-              <span>${realm.next ? `距「${realm.next.name}」還差 ${realm.remain}` : '已封頂'}</span>
-            </div>
-            <div class="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
-              <div class="h-full bg-blue-500 transition-all" style="width:${realm.pct.toFixed(2)}%"></div>
-            </div>
-          </section>
-
-          <!-- 區塊4：徽章提示（最高境界＋最高連續）
+          <!-- 區塊4：徽章提示（最高境界＋最高連續） -->
           <section class="pt-3">
             <div class="flex items-center gap-2 flex-wrap">
               ${(() => {
                 const realmSteps = [
-					{at:2500, txt:'🌌 飛升'},   // 銀河/宇宙感，升天突破
-					{at:2000, txt:'⚡ 化神'},   // 電光一閃，比 🔥 更神性
-					{at:1500, txt:'🍼 元嬰'},   // 奶瓶，比 👶 更俏皮
-					{at:1000, txt:'🌕 金丹'},   // 滿月 → 圓滿丹藥意象
-					{at:500,  txt:'🪨 築基'},   // 石頭 → 穩固基礎
-					{at:100,  txt:'🍃 煉氣'},   // 飄落葉子，比 🌿 更輕盈
+                  {at:2500, txt:'🕊️ 飛升'},
+                  {at:2000, txt:'🔥 化神'},
+                  {at:1500, txt:'👶 元嬰'},
+                  {at:1000, txt:'🔮 金丹'},
+                  {at:500,  txt:'🧱 築基'},
+                  {at:100,  txt:'🌱 煉氣'},
                 ];
                 let realmTop = null; for (const s of realmSteps) { if (total >= s.at) { realmTop = s; break; } }
                 const streakSteps = [ {d:30, txt:'🧘 30日'}, {d:21, txt:'🧘 21日'}, {d:14, txt:'🧘 14日'}, {d:7, txt:'🧘 7日'}, {d:3, txt:'🧘 3日'} ];
@@ -493,14 +472,14 @@
                 return badges.map(txt => `<span class="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${theme.chip} shadow-sm">${txt}</span>`).join('') || `<span class="text-xs text-gray-500">尚無徽章，今天動一下吧 💪</span>`;
               })()}
             </div>
-          </section>  -->
+          </section>
         `;
         cardsWrap.appendChild(card);
       });
     }
 
     // ===== 寫入自己紀錄（覆寫模式；寫入後頒發檢查） =====
-    async function saveReps(kind, date, newVal){ const ref = doc(db, `rounds/${ROUND_ID}/participants`, currentUser); const snap = await getDoc(ref); if (!snap.exists()) return; const data = snap.data(); const daily = typeof data.dailyLog === 'string' ? JSON.parse(data.dailyLog) : (data.dailyLog||{}); const old = ((daily[date]||{})[kind]) || 0; const diff = newVal - old; const accum = { squat: data.squat||0, pushup: data.pushup||0, rowing: data.rowing||0, total:  data.total ||0 }; accum[kind] += diff; accum.total += diff; if (!daily[date]) daily[date] = {squat:0,pushup:0,rowing:0}; daily[date][kind] = newVal; await setDoc(ref, { ...accum, dailyLog: JSON.stringify(daily), updatedAt: new Date().toISOString() }, { merge:true }); await checkAndAward(currentUser); }
+    async function saveReps(kind, date, newVal){ const ref = doc(db, `rounds/${ROUND_ID}/participants`, currentUser); const snap = await getDoc(ref); if (!snap.exists()) return; const data = snap.data(); const daily = typeof data.dailyLog === 'string' ? JSON.parse(data.dailyLog) : (data.dailyLog||{}); const old = ((daily[date]||{})[kind]) || 0; const diff = newVal - old; const accum = { squat: data.squat||0, pushup: data.pushup||0, rowing: data.rowing||0, bridge: data.bridge||0, total:  data.total ||0 }; accum[kind] += diff; accum.total += diff; if (!daily[date]) daily[date] = {squat:0,pushup:0,rowing:0,bridge:0}; daily[date][kind] = newVal; await setDoc(ref, { ...accum, dailyLog: JSON.stringify(daily), updatedAt: new Date().toISOString() }, { merge:true }); await checkAndAward(currentUser); }
 
     async function saveOwnName(newName){ await updateDoc(doc(db, `rounds/${ROUND_ID}/participants`, currentUser), { name: newName, updatedAt: new Date().toISOString() }); userName.textContent = newName; }
 
@@ -509,9 +488,10 @@
     logoutBtn.addEventListener('click', ()=>{ localStorage.removeItem('currentUser'); localStorage.removeItem('currentRoundId'); currentUser = null; showLogin(); });
 
     btnSquat.addEventListener('click', async ()=>{ const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser)); const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{}; return (dl[dateSelect.value]?.squat)||0; })(); const v = await showRepsModal('深蹲', cur); if (v===null) return; await saveReps('squat', dateSelect.value, v); });
-    btnPushup.addEventListener('click', async ()=>{ const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser)); const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{}; return (dl[dateSelect.value]?.pushup)||0; })(); const v = await showRepsModal('橋式挺身', cur); if (v===null) return; await saveReps('pushup', dateSelect.value, v); });
+    btnPushup.addEventListener('click', async ()=>{ const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser)); const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{}; return (dl[dateSelect.value]?.pushup)||0; })(); const v = await showRepsModal('伏地挺身', cur); if (v===null) return; await saveReps('pushup', dateSelect.value, v); });
     btnRowing.addEventListener('click', async ()=>{ const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser)); const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{}; return (dl[dateSelect.value]?.rowing)||0; })(); const v = await showRepsModal('划船', cur); if (v===null) return; await saveReps('rowing', dateSelect.value, v); });
 
+    btnBridge.addEventListener('click', async ()=>{ const cur = await (async ()=>{ const snap=await getDoc(doc(db,`rounds/${ROUND_ID}/participants`,currentUser)); const d = snap.data(); const dl=typeof d.dailyLog==='string'?JSON.parse(d.dailyLog):d.dailyLog||{}; return (dl[dateSelect.value]?.bridge)||0; })(); const v = await showRepsModal('橋式', cur); if (v===null) return; await saveReps('bridge', dateSelect.value, v); });
     function showRepsModal(type, initial){ return new Promise((resolve)=>{ repsModalTitle.textContent=`編輯${type}數量`; repsModalText.textContent=`請輸入你在 ${dateSelect.value} 完成的 ${type} 數量：`; repsInput.value = initial ?? ''; repsModal.style.display='flex'; repsInput.focus(); const onConfirm=()=>{ repsModal.style.display='none'; const v=parseInt(repsInput.value,10); resolve(Number.isFinite(v)&&v>=0 ? v : null); cleanup(); }; const onCancel =()=>{ repsModal.style.display='none'; resolve(null); cleanup(); }; function cleanup(){ repsModalConfirm.removeEventListener('click',onConfirm); repsModalCancel .removeEventListener('click',onCancel); } repsModalConfirm.addEventListener('click',onConfirm); repsModalCancel .addEventListener('click',onCancel); }); }
 
     nameModalConfirm.addEventListener('click', async ()=>{ const v = nameInput.value.trim(); if (!v) return; try{ await saveOwnName(v); }catch(e){ alert(`更新名稱失敗：${e.code||e.message}`); } nameModal.style.display='none'; });
@@ -522,5 +502,3 @@
   </script>
 </body>
 </html>
-
-
